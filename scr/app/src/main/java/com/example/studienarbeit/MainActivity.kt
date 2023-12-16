@@ -40,6 +40,8 @@ import com.example.studienarbeit.data.repository.hasLocationPermission
 import com.example.studienarbeit.presentation.LocationViewModel
 import com.example.studienarbeit.presentation.PermissionEvent
 import com.example.studienarbeit.presentation.ViewState
+import com.example.studienarbeit.screens.MainScreen
+import com.example.studienarbeit.screens.RationaleAlert
 import com.example.studienarbeit.ui.theme.StudienarbeitTheme
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
@@ -170,67 +172,14 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-@Composable
-fun MainScreen(currentPosition: LatLng, cameraState: CameraPositionState) {
-    val marker = LatLng(currentPosition.latitude, currentPosition.longitude)
-    GoogleMap(
-        modifier = Modifier.fillMaxSize(),
-        cameraPositionState = cameraState,
-        properties = MapProperties(
-            isMyLocationEnabled = true,
-            mapType = MapType.NORMAL,
-            isTrafficEnabled = true
-        )
-    ) {
-        Circle(
-            center = currentPosition,
-            strokeColor = Color.Black,
-            radius = 250.0,
-            strokeWidth = 20.0F,
 
-            )
-    }
-}
-
-@Composable
-fun RationaleAlert(onDismiss: () -> Unit, onConfirm: () -> Unit) {
-
-    Dialog(
-        onDismissRequest = onDismiss,
-        properties = DialogProperties()
-    ) {
-        Surface(
-            modifier = Modifier
-                .wrapContentWidth()
-                .wrapContentHeight(),
-            shape = MaterialTheme.shapes.large,
-            tonalElevation = AlertDialogDefaults.TonalElevation
-        ) {
-            Column(modifier = Modifier.padding(16.dp)) {
-                Text(
-                    text = "We need location permissions to use this app",
-                )
-                Spacer(modifier = Modifier.height(24.dp))
-                TextButton(
-                    onClick = {
-                        onConfirm()
-                        onDismiss()
-                    },
-                    modifier = Modifier.align(Alignment.End)
-                ) {
-                    Text("OK")
-                }
-            }
-        }
-    }
-}
 
 private suspend fun CameraPositionState.centerOnLocation(
     location: LatLng
 ) = animate(
     update = CameraUpdateFactory.newLatLngZoom(
         location,
-        15f
+        16.3f
     ),
     durationMs = 1500
 )
