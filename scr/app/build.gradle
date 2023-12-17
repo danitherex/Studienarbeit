@@ -4,6 +4,7 @@ plugins {
     id 'com.google.android.libraries.mapsplatform.secrets-gradle-plugin'
     id 'com.google.dagger.hilt.android'
     id 'kotlin-kapt'
+    id 'com.google.gms.google-services'
 
 }
 
@@ -75,6 +76,11 @@ dependencies {
     kapt "com.google.dagger:hilt-compiler:2.49"
 
     implementation 'com.google.accompanist:accompanist-permissions:0.33.2-alpha'
+
+    implementation platform('com.google.firebase:firebase-bom:32.7.0')
+    implementation 'com.google.firebase:firebase-analytics'
+    implementation "com.google.firebase:firebase-firestore"
+
 
 
 }

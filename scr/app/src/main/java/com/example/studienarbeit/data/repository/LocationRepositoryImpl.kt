@@ -7,30 +7,23 @@ import android.os.Build
 import android.os.Looper
 import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
-import com.example.studienarbeit.domain.repository.LocationService
+import com.example.studienarbeit.domain.repository.LocationRepository
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
-import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 import com.google.android.gms.maps.model.LatLng
-import dagger.Module
-import dagger.Provides
-import dagger.hilt.InstallIn
-import dagger.hilt.android.qualifiers.ApplicationContext
-import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import javax.inject.Inject
-import javax.inject.Singleton
 
 
-class LocationServiceImpl @Inject constructor(
+class LocationRepositoryImpl @Inject constructor(
     private val context: Context,
     private val locationClient: FusedLocationProviderClient
-): LocationService {
+): LocationRepository {
     @SuppressLint("MissingPermission")
     @RequiresApi(Build.VERSION_CODES.S)
     override fun requestLocationUpdates(): Flow<LatLng?> = callbackFlow {
@@ -71,10 +64,10 @@ class LocationServiceImpl @Inject constructor(
 }
 
 class GetLocationUseCase @Inject constructor(
-    private val locationService: LocationService
+    private val locationRepository: LocationRepository
 ) {
     @RequiresApi(Build.VERSION_CODES.S)
-    operator fun invoke(): Flow<LatLng?> = locationService.requestLocationUpdates()
+    operator fun invoke(): Flow<LatLng?> = locationRepository.requestLocationUpdates()
 
 }
 

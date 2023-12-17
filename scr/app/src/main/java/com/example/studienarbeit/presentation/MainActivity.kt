@@ -1,9 +1,8 @@
-package com.example.studienarbeit
+package com.example.studienarbeit.presentation
 
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Build
-import androidx.compose.runtime.Composable
 import android.os.Bundle
 import android.provider.Settings
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -14,46 +13,32 @@ import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.layout.wrapContentWidth
-import androidx.compose.material3.AlertDialogDefaults
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
-import androidx.compose.ui.window.DialogProperties
 import com.example.studienarbeit.data.repository.hasLocationPermission
-import com.example.studienarbeit.presentation.LocationViewModel
-import com.example.studienarbeit.presentation.PermissionEvent
-import com.example.studienarbeit.presentation.ViewState
-import com.example.studienarbeit.screens.MainScreen
-import com.example.studienarbeit.screens.RationaleAlert
+import com.example.studienarbeit.presentation.screens.main.MapViewModel
+import com.example.studienarbeit.presentation.screens.main.PermissionEvent
+import com.example.studienarbeit.presentation.screens.main.ViewState
+import com.example.studienarbeit.presentation.screens.main.components.Map
+import com.example.studienarbeit.presentation.screens.main.components.RationaleAlert
 import com.example.studienarbeit.ui.theme.StudienarbeitTheme
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.CameraPositionState
-import com.google.maps.android.compose.Circle
-import com.google.maps.android.compose.GoogleMap
-import com.google.maps.android.compose.MapProperties
-import com.google.maps.android.compose.MapType
-import com.google.maps.android.compose.Marker
-import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -66,8 +51,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val locationViewModel: LocationViewModel by viewModels()
-
+        val mapViewModel: MapViewModel by viewModels()
 
         setContent {
             val permissionState = rememberMultiplePermissionsState(
@@ -77,7 +61,7 @@ class MainActivity : ComponentActivity() {
                 )
             )
 
-            val viewState by locationViewModel.viewState.collectAsStateWithLifecycle()
+            val viewState by mapViewModel.viewState.collectAsStateWithLifecycle()
             StudienarbeitTheme {
                 // A surface container using the 'background' color from the theme
                 Surface(
@@ -92,7 +76,7 @@ class MainActivity : ComponentActivity() {
                     when {
                         permissionState.allPermissionsGranted -> {
                             LaunchedEffect(Unit) {
-                                locationViewModel.handle(PermissionEvent.Granted)
+                                mapViewModel.handle(PermissionEvent.Granted)
                             }
                         }
 
@@ -104,7 +88,7 @@ class MainActivity : ComponentActivity() {
 
                         !permissionState.allPermissionsGranted && !permissionState.shouldShowRationale -> {
                             LaunchedEffect(Unit) {
-                                locationViewModel.handle(PermissionEvent.Revoked)
+                                mapViewModel.handle(PermissionEvent.Revoked)
                             }
                         }
                     }
@@ -156,7 +140,7 @@ class MainActivity : ComponentActivity() {
                                     cameraState.centerOnLocation(currentLoc)
                                 }
 
-                                MainScreen(
+                                Map(
                                     currentPosition = LatLng(
                                         currentLoc.latitude,
                                         currentLoc.longitude
