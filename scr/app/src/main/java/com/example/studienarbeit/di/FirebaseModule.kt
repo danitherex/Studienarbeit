@@ -1,5 +1,6 @@
 package com.example.studienarbeit.di
 
+import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.FirebaseFirestore
 import dagger.Module
 import dagger.Provides
@@ -12,5 +13,5 @@ import javax.inject.Singleton
 object FirebaseModule {
     @Singleton
     @Provides
-    fun provideFireStore(): FirebaseFirestore = FirebaseFirestore.getInstance()
+    fun provideMarkerCollection(): CollectionReference = FirebaseFirestore.getInstance().collection("Markers")
 }

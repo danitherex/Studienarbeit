@@ -8,9 +8,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.studienarbeit.data.repository.GetLocationUseCase
+import com.example.studienarbeit.domain.model.Response
 import com.example.studienarbeit.domain.use_case.UseCases
 import com.google.android.gms.maps.model.LatLng
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
@@ -25,10 +27,12 @@ class MapViewModel @Inject constructor(
     private val useCases: UseCases
 ) : ViewModel() {
 
-    private val _markersState = mutableStateOf(MarkerState())
-    private val _viewState: MutableStateFlow<ViewState> = MutableStateFlow(ViewState.Loading)
-    val state: State<MarkerState> = _markersState
-    val viewState = _viewState.asStateFlow()
+    private val _markersState:MutableStateFlow<MarkerState> = MutableStateFlow(MarkerState.Loading)
+    val markersState = _markersState.asStateFlow()
+    private val _locationState: MutableStateFlow<LocationState> = MutableStateFlow(LocationState.Loading)
+    val locationState = _locationState.asStateFlow()
+
+    private var getNotesJob: Job?=null
 
 
     init {
@@ -50,31 +54,39 @@ class MapViewModel @Inject constructor(
             PermissionEvent.Granted -> {
                 viewModelScope.launch {
                     getLocationUseCase.invoke().collect { location ->
-                        _viewState.value = ViewState.Success(location)
+                        _locationState.value = LocationState.Success(location)
                     }
                 }
             }
 
             PermissionEvent.Revoked -> {
-                _viewState.value = ViewState.RevokedPermissions
+                _locationState.value = LocationState.RevokedPermissions
             }
         }
     }
 
     private fun getNotes() {
-        useCases.getMarkers()
+        getNotesJob?.cancel()
+        getNotesJob = useCases.getMarkers()
             .onEach { markers ->
-                Log.d("TEST", "getNotes: $markers")
+                when(markers){
+                    is Response.Success -> {
+                        _markersState.value = MarkerState.Success(markers.data)
+                    }
+                    is Response.Error -> {
+                        Log.d("MapViewModel", "getNotes: ${markers.message}")
+                    }
+
+                    else -> {
+                        Log.d("MapViewModel", "getNotes: ${markers}")
+                    }
+                }
             }
             .launchIn(viewModelScope)
     }
 }
 
-sealed interface ViewState {
-    object Loading : ViewState
-    data class Success(val location: LatLng?) : ViewState
-    object RevokedPermissions : ViewState
-}
+
 
 sealed interface PermissionEvent {
     object Granted : PermissionEvent

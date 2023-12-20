@@ -6,6 +6,7 @@ import com.example.studienarbeit.data.repository.MarkerRepositoryImpl
 import com.example.studienarbeit.domain.repository.LocationRepository
 import com.example.studienarbeit.domain.repository.MarkerRepository
 import com.google.android.gms.location.LocationServices
+import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.FirebaseFirestore
 import dagger.Module
 import dagger.Provides
@@ -30,6 +31,6 @@ object RepositoryModule {
     @Singleton
     @Provides
     fun provideMarkerRepository(
-        database: FirebaseFirestore
-    ): MarkerRepository = MarkerRepositoryImpl(database)
+        collection: CollectionReference
+    ): MarkerRepository = MarkerRepositoryImpl(collection)
 }

@@ -28,6 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.example.studienarbeit.data.repository.hasLocationPermission
+import com.example.studienarbeit.presentation.screens.main.LocationState
 import com.example.studienarbeit.presentation.screens.main.MapViewModel
 import com.example.studienarbeit.presentation.screens.main.PermissionEvent
 import com.example.studienarbeit.presentation.screens.main.ViewState
@@ -61,7 +62,7 @@ class MainActivity : ComponentActivity() {
                 )
             )
 
-            val viewState by mapViewModel.viewState.collectAsStateWithLifecycle()
+            val viewState by mapViewModel.locationState.collectAsStateWithLifecycle()
             StudienarbeitTheme {
                 // A surface container using the 'background' color from the theme
                 Surface(
@@ -95,7 +96,7 @@ class MainActivity : ComponentActivity() {
 
                     with(viewState) {
                         when (this) {
-                            ViewState.Loading -> {
+                            LocationState.Loading -> {
                                 Box(
                                     modifier = Modifier.fillMaxSize(),
                                     contentAlignment = Alignment.Center
@@ -104,7 +105,7 @@ class MainActivity : ComponentActivity() {
                                 }
                             }
 
-                            ViewState.RevokedPermissions -> {
+                            LocationState.RevokedPermissions -> {
                                 Column(
                                     modifier = Modifier
                                         .fillMaxSize()
@@ -128,7 +129,7 @@ class MainActivity : ComponentActivity() {
                                 }
                             }
 
-                            is ViewState.Success -> {
+                            is LocationState.Success -> {
                                 val currentLoc =
                                     LatLng(
                                         location?.latitude ?: 0.0,

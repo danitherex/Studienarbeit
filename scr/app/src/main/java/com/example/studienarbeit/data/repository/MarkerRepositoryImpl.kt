@@ -4,6 +4,7 @@ import android.util.Log
 import com.example.studienarbeit.domain.model.Marker
 import com.example.studienarbeit.domain.model.Response
 import com.example.studienarbeit.domain.repository.MarkerRepository
+import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -11,11 +12,10 @@ import kotlinx.coroutines.flow.callbackFlow
 import javax.inject.Inject
 
 class MarkerRepositoryImpl @Inject constructor(
-    private val database: FirebaseFirestore
+    private val markerCollection: CollectionReference
 ) : MarkerRepository {
     override fun getMarkers(): Flow<Response<List<Marker>>> = callbackFlow {
-        val collection = database.collection("Markers")
-        val subscription = collection.addSnapshotListener { snapshot, exception ->
+        val subscription = markerCollection.addSnapshotListener { snapshot, exception ->
             if (exception != null) {
                 trySend(Response.Error(exception)).isSuccess
                 return@addSnapshotListener

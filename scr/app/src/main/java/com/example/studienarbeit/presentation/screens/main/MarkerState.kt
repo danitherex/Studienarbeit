@@ -2,6 +2,7 @@ package com.example.studienarbeit.presentation.screens.main
 
 import com.example.studienarbeit.domain.model.Marker
 
-data class MarkerState(
-    val markers: List<Marker> = emptyList(),
-)
+sealed interface MarkerState {
+    object Loading : MarkerState
+    data class Success(val markers: List<Marker>?) : MarkerState
+}
