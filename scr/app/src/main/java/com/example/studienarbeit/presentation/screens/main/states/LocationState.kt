@@ -1,4 +1,4 @@
-package com.example.studienarbeit.presentation.screens.main
+package com.example.studienarbeit.presentation.screens.main.states
 
 import com.google.android.gms.maps.model.LatLng
 

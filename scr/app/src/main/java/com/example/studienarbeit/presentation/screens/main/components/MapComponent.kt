@@ -1,6 +1,7 @@
 package com.example.studienarbeit.presentation.screens.main.components
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -8,6 +9,7 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -18,23 +20,25 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.studienarbeit.presentation.screens.main.BootomSheetState
-import com.example.studienarbeit.presentation.screens.main.MarkersState
+import com.example.studienarbeit.presentation.screens.main.states.BootomSheetState
+import com.example.studienarbeit.presentation.screens.main.states.MarkersState
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.CameraPositionState
 import com.google.maps.android.compose.Circle
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapType
-import com.google.maps.android.compose.Marker
-import com.google.maps.android.compose.MarkerState
+import com.google.maps.android.compose.MapUiSettings
 import kotlinx.coroutines.launch
+import kotlin.random.Random
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MapComponent(
-    currentPosition: LatLng, cameraState: CameraPositionState,
-    markers: MarkersState
+    currentPosition: LatLng,
+    cameraState: CameraPositionState,
+    markers: State<MarkersState>,
+    innerPadding: PaddingValues
 ) {
     var showBottomSheet by remember { mutableStateOf(false) }
     var bottomSheetState by remember { mutableStateOf(BootomSheetState("", "")) }
@@ -71,20 +75,18 @@ fun MapComponent(
                 isMyLocationEnabled = true,
                 mapType = MapType.NORMAL,
                 isTrafficEnabled = true
+            ),
+            uiSettings = MapUiSettings(
+                myLocationButtonEnabled = false,
+                zoomControlsEnabled = false,
+                compassEnabled = true
             )
         ) {
-            when (markers) {
+            when (markers.value) {
                 is MarkersState.Success -> {
-                    markers.markers?.forEach { marker ->
-                        Marker(
-                            state = MarkerState(
-                                LatLng(
-                                    marker.position.latitude,
-                                    marker.position.longitude
-                                )
-                            ),
-                            title = marker.title,
-                            snippet = marker.description,
+                    (markers.value as MarkersState.Success).markerModels.forEach { marker ->
+                        ImageMarker(marker = marker,
+                            icon = Icons.entries[Random.nextInt(Icons.entries.size)],
                             onClick = {
                                 bottomSheetState = BootomSheetState(
                                     marker.title,
@@ -92,7 +94,6 @@ fun MapComponent(
                                 )
                                 showBottomSheet = true
                                 scope.launch { sheetState.show() }
-                                true
                             }
                         )
                     }

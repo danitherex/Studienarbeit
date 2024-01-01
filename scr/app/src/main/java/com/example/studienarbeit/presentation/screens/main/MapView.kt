@@ -11,12 +11,20 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.MyLocation
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -26,12 +34,14 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.studienarbeit.data.repository.hasLocationPermission
 import com.example.studienarbeit.presentation.screens.main.components.MapComponent
 import com.example.studienarbeit.presentation.screens.main.components.RationaleAlert
+import com.example.studienarbeit.presentation.screens.main.states.LocationState
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.CameraPositionState
 import com.google.maps.android.compose.rememberCameraPositionState
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalPermissionsApi::class)
 @RequiresApi(Build.VERSION_CODES.S)
@@ -112,20 +122,37 @@ fun MapView(viewModel: MapViewModel) {
                         location?.latitude ?: 0.0,
                         location?.longitude ?: 0.0
                     )
+                val scope = rememberCoroutineScope()
                 val cameraState = rememberCameraPositionState()
+                val bool = rememberSaveable { true }
 
-                LaunchedEffect(key1 = currentLoc) {
+                LaunchedEffect(key1 = bool) {
                     cameraState.centerOnLocation(currentLoc)
                 }
-
+                Scaffold(
+                    modifier = Modifier
+                        .fillMaxSize(),
+                    floatingActionButton = {
+                        FloatingActionButton(onClick = {
+                            scope.launch {
+                                cameraState.centerOnLocation(currentLoc)
+                            }
+                        }) {
+                            Icon(Icons.Outlined.MyLocation, "MyLocation floating action button")
+                        }
+                    }
+                ) {innerPadding->
                 MapComponent(
                     currentPosition = LatLng(
                         currentLoc.latitude,
                         currentLoc.longitude
                     ),
+                    innerPadding=innerPadding,
                     cameraState = cameraState,
-                    markers = viewModel.markersState.value
+                    markers = viewModel.markersState.collectAsState()
                 )
+                }
+
             }
         }
     }

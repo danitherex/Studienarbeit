@@ -8,6 +8,8 @@ import androidx.lifecycle.viewModelScope
 import com.example.studienarbeit.data.repository.GetLocationUseCase
 import com.example.studienarbeit.domain.model.Response
 import com.example.studienarbeit.domain.use_case.UseCases
+import com.example.studienarbeit.presentation.screens.main.states.LocationState
+import com.example.studienarbeit.presentation.screens.main.states.MarkersState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow

@@ -1,12 +1,12 @@
 package com.example.studienarbeit.domain.repository
 
-import com.example.studienarbeit.domain.model.Marker
+import com.example.studienarbeit.domain.model.MarkerModel
 import com.example.studienarbeit.domain.model.Response
 import kotlinx.coroutines.flow.Flow
 
 interface MarkerRepository {
 
-    fun getMarkers(): Flow<Response<List<Marker>>>
+    fun getMarkers(): Flow<Response<List<MarkerModel>>>
 
     fun deleteMarker(markerId: String): Flow<Response<Unit>>
 
