@@ -86,7 +86,6 @@ fun MapComponent(
                 is MarkersState.Success -> {
                     (markers.value as MarkersState.Success).markerModels.forEach { marker ->
                         ImageMarker(marker = marker,
-                            icon = Icons.entries[Random.nextInt(Icons.entries.size)],
                             onClick = {
                                 bottomSheetState = BootomSheetState(
                                     marker.title,

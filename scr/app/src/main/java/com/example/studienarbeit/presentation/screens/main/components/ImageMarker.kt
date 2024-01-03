@@ -8,7 +8,11 @@ import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 
 @Composable
-fun ImageMarker( marker: MarkerModel,icon: Icons, onClick: () -> Unit) {
+fun ImageMarker( marker: MarkerModel, onClick: () -> Unit) {
+    var icon = Icons.entries.find { it.name==marker.type.uppercase() }
+    if(icon==null){
+        icon = Icons.RESTAURANT
+    }
     Marker(
         state = MarkerState(
             position = LatLng(marker.position.latitude,marker.position.longitude)
