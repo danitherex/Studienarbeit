@@ -1,4 +1,4 @@
-package com.example.studienarbeit.presentation.screens.main
+package com.example.studienarbeit.presentation.screens.map
 
 import android.Manifest
 import android.content.Intent
@@ -32,9 +32,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.studienarbeit.data.repository.hasLocationPermission
-import com.example.studienarbeit.presentation.screens.main.components.MapComponent
-import com.example.studienarbeit.presentation.screens.main.components.RationaleAlert
-import com.example.studienarbeit.presentation.screens.main.states.LocationState
+import com.example.studienarbeit.presentation.screens.map.components.MapComponent
+import com.example.studienarbeit.presentation.screens.map.components.RationaleAlert
+import com.example.studienarbeit.presentation.screens.map.states.LocationState
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -46,7 +46,7 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalPermissionsApi::class)
 @RequiresApi(Build.VERSION_CODES.S)
 @Composable
-fun MapView(viewModel: MapViewModel) {
+fun MapScreen(viewModel: MapViewModel) {
     val context = LocalContext.current
     val viewState by viewModel.locationState.collectAsStateWithLifecycle()
 

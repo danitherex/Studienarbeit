@@ -1,4 +1,4 @@
-package com.example.studienarbeit.presentation.screens.main.components
+package com.example.studienarbeit.presentation.screens.map.components
 
 import androidx.compose.runtime.Composable
 import com.example.studienarbeit.domain.model.MarkerModel

@@ -1,4 +1,4 @@
-package com.example.studienarbeit.presentation.screens.main.components
+package com.example.studienarbeit.presentation.screens.map.components
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
