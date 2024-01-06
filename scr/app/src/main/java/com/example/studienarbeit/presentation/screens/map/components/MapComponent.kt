@@ -37,8 +37,9 @@ fun MapComponent(
     currentPosition: LatLng,
     cameraState: CameraPositionState,
     markers: State<MarkersState>,
-    innerPadding: PaddingValues
-) {
+    innerPadding: PaddingValues,
+    radius:Double
+    ) {
     var showBottomSheet by remember { mutableStateOf(false) }
     var bottomSheetState by remember { mutableStateOf(BootomSheetState("", "")) }
 
@@ -47,7 +48,11 @@ fun MapComponent(
 
 
 
-    Column(modifier = Modifier.fillMaxSize()) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(innerPadding)
+    ) {
         if (showBottomSheet) {
             ModalBottomSheet(
                 onDismissRequest = { showBottomSheet = false },
@@ -104,7 +109,7 @@ fun MapComponent(
             Circle(
                 center = currentPosition,
                 strokeColor = Color.Black,
-                radius = 250.0,
+                radius = radius,
                 strokeWidth = 20.0F,
 
                 )

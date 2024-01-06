@@ -1,5 +1,6 @@
 package com.example.studienarbeit.presentation.screens.map
 
+import RadiusSlider
 import android.Manifest
 import android.content.Intent
 import android.os.Build
@@ -28,6 +29,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableDoubleStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -36,6 +39,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.studienarbeit.R
 import com.example.studienarbeit.data.repository.hasLocationPermission
 import com.example.studienarbeit.presentation.screens.map.components.MapComponent
 import com.example.studienarbeit.presentation.screens.map.components.RationaleAlert
@@ -133,10 +137,14 @@ fun MapScreen(
                 val scope = rememberCoroutineScope()
                 val cameraState = rememberCameraPositionState()
                 val bool = rememberSaveable { true }
+                val radius = remember {
+                    mutableDoubleStateOf(250.0)
+                }
 
                 LaunchedEffect(key1 = bool) {
                     cameraState.centerOnLocation(currentLoc)
                 }
+
                 Scaffold(
                     modifier = Modifier
                         .fillMaxSize(),
@@ -152,7 +160,7 @@ fun MapScreen(
                     topBar = {
                         TopAppBar(
                             title = {
-                                Text(text = "GeoMemo")
+                                Text(text = (context.getString(R.string.app_name)))
                             },
                             actions = {
                                 IconButton(onClick = {
@@ -168,15 +176,24 @@ fun MapScreen(
                         )
                     }
                 ) { innerPadding ->
-                    MapComponent(
-                        currentPosition = LatLng(
-                            currentLoc.latitude,
-                            currentLoc.longitude
-                        ),
-                        innerPadding = innerPadding,
-                        cameraState = cameraState,
-                        markers = viewModel.markersState.collectAsState()
-                    )
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize(),
+                        contentAlignment = Alignment.CenterEnd
+                    ) {
+
+                        MapComponent(
+                            currentPosition = LatLng(
+                                currentLoc.latitude,
+                                currentLoc.longitude
+                            ),
+                            innerPadding = innerPadding,
+                            cameraState = cameraState,
+                            markers = viewModel.markersState.collectAsState(),
+                            radius = radius.doubleValue
+                        )
+                        RadiusSlider(radius = radius)
+                    }
                 }
 
             }
