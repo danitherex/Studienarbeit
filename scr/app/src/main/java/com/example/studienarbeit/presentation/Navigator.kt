@@ -1,4 +1,4 @@
-package com.example.studienarbeit.presentation.navigation
+package com.example.studienarbeit.presentation
 
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -14,6 +14,7 @@ class Navigator {
 
     enum class NavTarget(val label:String){
         MAP("Map"),
-        LOGIN("Login")
+        LOGIN("Login"),
+        PROFILE("profile")
     }
 }

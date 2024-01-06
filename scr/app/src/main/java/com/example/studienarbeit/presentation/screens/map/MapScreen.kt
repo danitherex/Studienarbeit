@@ -13,12 +13,17 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.MyLocation
+import androidx.compose.material.icons.outlined.PersonOutline
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults.topAppBarColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -43,10 +48,13 @@ import com.google.maps.android.compose.CameraPositionState
 import com.google.maps.android.compose.rememberCameraPositionState
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalPermissionsApi::class)
+@OptIn(ExperimentalPermissionsApi::class, ExperimentalMaterial3Api::class)
 @RequiresApi(Build.VERSION_CODES.S)
 @Composable
-fun MapScreen(viewModel: MapViewModel) {
+fun MapScreen(
+    viewModel: MapViewModel,
+    navigateTo: () -> Unit
+) {
     val context = LocalContext.current
     val viewState by viewModel.locationState.collectAsStateWithLifecycle()
 
@@ -140,17 +148,35 @@ fun MapScreen(viewModel: MapViewModel) {
                         }) {
                             Icon(Icons.Outlined.MyLocation, "MyLocation floating action button")
                         }
+                    },
+                    topBar = {
+                        TopAppBar(
+                            title = {
+                                Text(text = "GeoMemo")
+                            },
+                            actions = {
+                                IconButton(onClick = {
+                                    navigateTo()
+                                }) {
+                                    Icon(
+                                        imageVector = Icons.Outlined.PersonOutline,
+                                        contentDescription = "Profile"
+                                    )
+                                }
+                            },
+                            colors = topAppBarColors(containerColor = Color.Gray)
+                        )
                     }
-                ) {innerPadding->
-                MapComponent(
-                    currentPosition = LatLng(
-                        currentLoc.latitude,
-                        currentLoc.longitude
-                    ),
-                    innerPadding=innerPadding,
-                    cameraState = cameraState,
-                    markers = viewModel.markersState.collectAsState()
-                )
+                ) { innerPadding ->
+                    MapComponent(
+                        currentPosition = LatLng(
+                            currentLoc.latitude,
+                            currentLoc.longitude
+                        ),
+                        innerPadding = innerPadding,
+                        cameraState = cameraState,
+                        markers = viewModel.markersState.collectAsState()
+                    )
                 }
 
             }

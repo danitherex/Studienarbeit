@@ -24,9 +24,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.studienarbeit.domain.repository.GoogleAuthRepository
-import com.example.studienarbeit.presentation.navigation.Navigator
 import com.example.studienarbeit.presentation.screens.map.MapScreen
 import com.example.studienarbeit.presentation.screens.map.MapViewModel
+import com.example.studienarbeit.presentation.screens.profile.ProfileScreen
 import com.example.studienarbeit.presentation.screens.signin.SignInScreen
 import com.example.studienarbeit.presentation.screens.signin.SignInViewModel
 import com.example.studienarbeit.ui.theme.StudienarbeitTheme
@@ -40,7 +40,7 @@ import javax.inject.Inject
 class MainActivity : ComponentActivity() {
 
     @Inject
-    lateinit var googleAuthUiClient:GoogleAuthRepository
+    lateinit var googleAuthUiClient: GoogleAuthRepository
 
     @RequiresApi(Build.VERSION_CODES.S)
     @SuppressLint("MissingPermission")
@@ -63,13 +63,16 @@ class MainActivity : ComponentActivity() {
                         }.launchIn(this)
                     }
 
-                    NavHost(navController = navController, startDestination = Navigator.NavTarget.LOGIN.label) {
+                    NavHost(
+                        navController = navController,
+                        startDestination = Navigator.NavTarget.LOGIN.label
+                    ) {
                         composable(Navigator.NavTarget.LOGIN.label) {
                             val viewModel = viewModel<SignInViewModel>()
                             val state by viewModel.state.collectAsStateWithLifecycle()
 
-                            LaunchedEffect(key1 = Unit){
-                                if(googleAuthUiClient.getSignedUser()!=null){
+                            LaunchedEffect(key1 = Unit) {
+                                if (googleAuthUiClient.getSignedUser() != null) {
                                     navController.navigate(Navigator.NavTarget.MAP.label)
                                 }
                             }
@@ -89,9 +92,9 @@ class MainActivity : ComponentActivity() {
                                     }
                                 }
                             )
-                            
-                            LaunchedEffect(key1 = state.isSignedInSuccessfull){
-                                if(state.isSignedInSuccessfull){
+
+                            LaunchedEffect(key1 = state.isSignedInSuccessfull) {
+                                if (state.isSignedInSuccessfull) {
                                     Toast.makeText(
                                         applicationContext,
                                         "Sign in successful",
@@ -110,15 +113,40 @@ class MainActivity : ComponentActivity() {
                                         val signInIntentSender = googleAuthUiClient.signIn()
                                         launcher.launch(
                                             IntentSenderRequest.Builder(
-                                                signInIntentSender?:return@launch
+                                                signInIntentSender ?: return@launch
                                             ).build()
                                         )
                                     }
                                 })
                         }
-                        composable(Navigator.NavTarget.MAP.label){
+                        composable(Navigator.NavTarget.MAP.label) {
                             val viewModel = hiltViewModel<MapViewModel>()
-                            MapScreen(viewModel = viewModel)
+                            MapScreen(
+                                viewModel = viewModel,
+                                navigateTo = {
+                                    navigator.navigateTo(Navigator.NavTarget.PROFILE)
+                                }
+                            )
+                        }
+                        composable(Navigator.NavTarget.PROFILE.label) {
+                            ProfileScreen(
+                                userData = googleAuthUiClient.getSignedUser(),
+                                onSignOut = {
+                                    lifecycleScope.launch {
+                                        googleAuthUiClient.signOut()
+                                        Toast.makeText(
+                                            applicationContext,
+                                            "Signed out",
+                                            Toast.LENGTH_LONG
+                                        ).show()
+
+                                        navController.navigate(Navigator.NavTarget.LOGIN.label)
+                                    }
+                                },
+                                navigateBack = {
+                                    navigator.navigateTo(Navigator.NavTarget.MAP)
+                                }
+                                )
                         }
                     }
                 }
