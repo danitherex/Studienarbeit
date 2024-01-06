@@ -2,22 +2,34 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Slider
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableDoubleState
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.layout
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.dp
+import com.example.studienarbeit.presentation.datastore
+import kotlinx.coroutines.launch
 
 @Composable
 fun RadiusSlider(
-    radius: MutableDoubleState
+    radius: Double,
 ) {
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+
     Slider(
-        value = radius.doubleValue.toFloat(),
-        onValueChange = {
-            radius.doubleValue = it.toDouble()
+        value = radius.toFloat(),
+        onValueChange = { newRadius ->
+            scope.launch {
+                context.datastore.updateData {
+                    it.copy(
+                        radius = newRadius.toDouble()
+                    )
+                }
+            }
         },
         valueRange = 120f..500f,
         modifier = Modifier

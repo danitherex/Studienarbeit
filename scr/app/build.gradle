@@ -5,6 +5,7 @@ plugins {
     id 'com.google.dagger.hilt.android'
     id 'kotlin-kapt'
     id 'com.google.gms.google-services'
+    id 'org.jetbrains.kotlin.plugin.serialization'
 
 }
 
@@ -87,6 +88,9 @@ dependencies {
     implementation "com.google.firebase:firebase-firestore"
     implementation("com.google.firebase:firebase-auth")
     implementation("com.google.android.gms:play-services-auth:20.7.0")
+
+    implementation  "androidx.datastore:datastore:1.0.0"
+    implementation  "org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.2"
 
 
 

@@ -1,6 +1,7 @@
 package com.example.studienarbeit.presentation
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.os.Build
 import android.os.Bundle
 import android.widget.Toast
@@ -16,6 +17,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.datastore.dataStore
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -23,6 +25,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.studienarbeit.settings.AppSettingsSerializer
 import com.example.studienarbeit.domain.repository.GoogleAuthRepository
 import com.example.studienarbeit.presentation.screens.map.MapScreen
 import com.example.studienarbeit.presentation.screens.map.MapViewModel
@@ -35,6 +38,9 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+
+
+val Context.datastore by dataStore("app-settings.json", AppSettingsSerializer)
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -49,7 +55,6 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             StudienarbeitTheme {
-                // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background

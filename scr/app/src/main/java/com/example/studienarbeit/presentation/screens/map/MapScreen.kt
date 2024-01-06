@@ -29,8 +29,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableDoubleStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -39,8 +37,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.studienarbeit.settings.AppSettings
 import com.example.studienarbeit.R
 import com.example.studienarbeit.data.repository.hasLocationPermission
+import com.example.studienarbeit.presentation.datastore
 import com.example.studienarbeit.presentation.screens.map.components.MapComponent
 import com.example.studienarbeit.presentation.screens.map.components.RationaleAlert
 import com.example.studienarbeit.presentation.screens.map.states.LocationState
@@ -137,9 +137,10 @@ fun MapScreen(
                 val scope = rememberCoroutineScope()
                 val cameraState = rememberCameraPositionState()
                 val bool = rememberSaveable { true }
-                val radius = remember {
-                    mutableDoubleStateOf(250.0)
-                }
+
+                val appSettings =
+                    context.datastore.data.collectAsState(initial = AppSettings())
+
 
                 LaunchedEffect(key1 = bool) {
                     cameraState.centerOnLocation(currentLoc)
@@ -190,9 +191,11 @@ fun MapScreen(
                             innerPadding = innerPadding,
                             cameraState = cameraState,
                             markers = viewModel.markersState.collectAsState(),
-                            radius = radius.doubleValue
+                            radius = appSettings.value.radius
                         )
-                        RadiusSlider(radius = radius)
+                        RadiusSlider(
+                            radius = appSettings.value.radius
+                        )
                     }
                 }
 
