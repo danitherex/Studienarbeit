@@ -1,4 +1,4 @@
-package com.example.studienarbeit.presentation.screens.map
+package com.example.studienarbeit.presentation.map
 
 import RadiusSlider
 import android.Manifest
@@ -9,12 +9,16 @@ import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.LocationOff
+import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material.icons.outlined.MyLocation
 import androidx.compose.material.icons.outlined.PersonOutline
+import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -41,9 +45,9 @@ import com.example.studienarbeit.settings.AppSettings
 import com.example.studienarbeit.R
 import com.example.studienarbeit.data.repository.hasLocationPermission
 import com.example.studienarbeit.presentation.datastore
-import com.example.studienarbeit.presentation.screens.map.components.MapComponent
-import com.example.studienarbeit.presentation.screens.map.components.RationaleAlert
-import com.example.studienarbeit.presentation.screens.map.states.LocationState
+import com.example.studienarbeit.presentation.map.components.MapComponent
+import com.example.studienarbeit.presentation.map.components.RationaleAlert
+import com.example.studienarbeit.presentation.map.states.LocationState
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -105,6 +109,7 @@ fun MapScreen(
             }
 
             LocationState.RevokedPermissions -> {
+
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
@@ -129,6 +134,7 @@ fun MapScreen(
             }
 
             is LocationState.Success -> {
+
                 val currentLoc =
                     LatLng(
                         location?.latitude ?: 0.0,
@@ -175,6 +181,38 @@ fun MapScreen(
                             },
                             colors = topAppBarColors(containerColor = Color.Gray)
                         )
+                    },
+                    bottomBar = {
+                        BottomAppBar {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxSize(),
+                                horizontalArrangement = Arrangement.SpaceEvenly,
+                            ) {
+                                IconButton(onClick = {
+                                    Intent(context, LocationService::class.java).apply {
+                                        this.action = LocationService.ACTION_START
+                                        context.startService(this)
+                                    }
+                                }) {
+                                    Icon(
+                                        imageVector = Icons.Outlined.LocationOn,
+                                        contentDescription = "Start LocationService"
+                                    )
+                                }
+                                IconButton(onClick = {
+                                    Intent(context, LocationService::class.java).apply {
+                                        this.action = LocationService.ACTION_STOP
+                                        context.startService(this)
+                                    }
+                                }) {
+                                    Icon(
+                                        imageVector = Icons.Outlined.LocationOff,
+                                        contentDescription = "Stop LocationService"
+                                    )
+                                }
+                            }
+                        }
                     }
                 ) { innerPadding ->
                     Box(

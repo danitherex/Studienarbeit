@@ -3,6 +3,7 @@ package com.example.studienarbeit.data.repository
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
+import android.location.LocationManager
 import android.os.Build
 import android.os.Looper
 import androidx.annotation.RequiresApi
@@ -26,15 +27,22 @@ class LocationRepositoryImpl @Inject constructor(
 ): LocationRepository {
     @SuppressLint("MissingPermission")
     @RequiresApi(Build.VERSION_CODES.S)
-    override fun requestLocationUpdates(): Flow<LatLng?> = callbackFlow {
+    override fun requestLocationUpdates(interval:Long): Flow<LatLng?> = callbackFlow {
 
         if (!context.hasLocationPermission()) {
             trySend(null)
             return@callbackFlow
         }
 
-        val request = LocationRequest.Builder(10000L)
-            .setIntervalMillis(10000L)
+        val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        val isGpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
+        val isNetworkEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
+        if(!isGpsEnabled && !isNetworkEnabled){
+            trySend(null)
+            return@callbackFlow
+        }
+
+        val request = LocationRequest.Builder(interval)
             .setPriority(Priority.PRIORITY_HIGH_ACCURACY)
             .build()
 
@@ -63,13 +71,6 @@ class LocationRepositoryImpl @Inject constructor(
 
 }
 
-class GetLocationUseCase @Inject constructor(
-    private val locationRepository: LocationRepository
-) {
-    @RequiresApi(Build.VERSION_CODES.S)
-    operator fun invoke(): Flow<LatLng?> = locationRepository.requestLocationUpdates()
-
-}
 
 fun Context.hasLocationPermission(): Boolean {
     return ContextCompat.checkSelfPermission(

@@ -1,4 +1,4 @@
-package com.example.studienarbeit.presentation.screens.map.components
+package com.example.studienarbeit.presentation.map.components
 
 import com.example.studienarbeit.R
 

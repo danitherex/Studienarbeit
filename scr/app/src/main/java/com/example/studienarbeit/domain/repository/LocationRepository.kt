@@ -4,6 +4,6 @@ import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.flow.Flow
 
 interface LocationRepository {
-    fun requestLocationUpdates(): Flow<LatLng?>
+    fun requestLocationUpdates(interval:Long): Flow<LatLng?>
     fun requestCurrentLocation(): Flow<LatLng?>
 }

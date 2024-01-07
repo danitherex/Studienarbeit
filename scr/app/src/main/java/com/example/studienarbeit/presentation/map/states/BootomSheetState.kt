@@ -1,4 +1,4 @@
-package com.example.studienarbeit.presentation.screens.map.states
+package com.example.studienarbeit.presentation.map.states
 
 data class BootomSheetState(
     val title: String,

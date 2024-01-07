@@ -1,7 +1,7 @@
-package com.example.studienarbeit.presentation.screens.signin
+package com.example.studienarbeit.presentation.signin
 
 data class SignInResult(
-    val data:UserData?,
+    val data: UserData?,
     val errorMessage:String?
 )
 

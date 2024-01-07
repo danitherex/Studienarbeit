@@ -5,8 +5,8 @@ import android.content.Intent
 import android.content.IntentSender
 import com.example.studienarbeit.R
 import com.example.studienarbeit.domain.repository.GoogleAuthRepository
-import com.example.studienarbeit.presentation.screens.signin.SignInResult
-import com.example.studienarbeit.presentation.screens.signin.UserData
+import com.example.studienarbeit.presentation.signin.SignInResult
+import com.example.studienarbeit.presentation.signin.UserData
 import com.google.android.gms.auth.api.identity.BeginSignInRequest
 import com.google.android.gms.auth.api.identity.SignInClient
 import com.google.firebase.auth.FirebaseAuth

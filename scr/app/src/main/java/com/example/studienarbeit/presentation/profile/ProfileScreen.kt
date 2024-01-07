@@ -1,4 +1,4 @@
-package com.example.studienarbeit.presentation.screens.profile
+package com.example.studienarbeit.presentation.profile
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Arrangement
@@ -31,7 +31,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
-import com.example.studienarbeit.presentation.screens.signin.UserData
+import com.example.studienarbeit.presentation.signin.UserData
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

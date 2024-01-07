@@ -1,15 +1,15 @@
-package com.example.studienarbeit.presentation.screens.map
+package com.example.studienarbeit.presentation.map
 
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.studienarbeit.data.repository.GetLocationUseCase
 import com.example.studienarbeit.domain.model.Response
+import com.example.studienarbeit.domain.use_case.GetLocation
 import com.example.studienarbeit.domain.use_case.UseCases
-import com.example.studienarbeit.presentation.screens.map.states.LocationState
-import com.example.studienarbeit.presentation.screens.map.states.MarkersState
+import com.example.studienarbeit.presentation.map.states.LocationState
+import com.example.studienarbeit.presentation.map.states.MarkersState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,9 +22,10 @@ import javax.inject.Inject
 @RequiresApi(Build.VERSION_CODES.S)
 @HiltViewModel
 class MapViewModel @Inject constructor(
-    private val getLocationUseCase: GetLocationUseCase,
+    private val getLocationUseCase: GetLocation,
     private val useCases: UseCases
-) : ViewModel() {
+    ) : ViewModel() {
+
 
     private val _markersState:MutableStateFlow<MarkersState> = MutableStateFlow(MarkersState.Loading)
     val markersState = _markersState.asStateFlow()
@@ -55,6 +56,7 @@ class MapViewModel @Inject constructor(
                     getLocationUseCase.invoke().collect { location ->
                         _locationState.value = LocationState.Success(location)
                     }
+
                 }
             }
 
@@ -77,7 +79,7 @@ class MapViewModel @Inject constructor(
                     }
 
                     else -> {
-                        Log.d("MapViewModel", "getNotes: ${markers}")
+                        Log.d("MapViewModel", "getNotes: $markers")
                     }
                 }
             }

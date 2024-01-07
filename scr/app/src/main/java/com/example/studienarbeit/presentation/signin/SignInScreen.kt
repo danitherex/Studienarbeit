@@ -1,4 +1,4 @@
-package com.example.studienarbeit.presentation.screens.signin
+package com.example.studienarbeit.presentation.signin
 
 import android.widget.Toast
 import androidx.compose.foundation.layout.Box
@@ -15,7 +15,7 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun SignInScreen (
-    state:SignInState,
+    state: SignInState,
     onSignInClick:()->Unit
 ){
     val context = LocalContext.current

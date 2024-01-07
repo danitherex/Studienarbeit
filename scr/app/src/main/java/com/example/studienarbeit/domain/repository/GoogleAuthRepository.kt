@@ -2,8 +2,8 @@ package com.example.studienarbeit.domain.repository
 
 import android.content.Intent
 import android.content.IntentSender
-import com.example.studienarbeit.presentation.screens.signin.SignInResult
-import com.example.studienarbeit.presentation.screens.signin.UserData
+import com.example.studienarbeit.presentation.signin.SignInResult
+import com.example.studienarbeit.presentation.signin.UserData
 
 interface GoogleAuthRepository {
 

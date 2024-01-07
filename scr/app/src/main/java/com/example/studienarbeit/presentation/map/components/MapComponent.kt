@@ -1,4 +1,4 @@
-package com.example.studienarbeit.presentation.screens.map.components
+package com.example.studienarbeit.presentation.map.components
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -20,8 +20,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.studienarbeit.presentation.screens.map.states.BootomSheetState
-import com.example.studienarbeit.presentation.screens.map.states.MarkersState
+import com.example.studienarbeit.presentation.map.states.BootomSheetState
+import com.example.studienarbeit.presentation.map.states.MarkersState
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.CameraPositionState
 import com.google.maps.android.compose.Circle

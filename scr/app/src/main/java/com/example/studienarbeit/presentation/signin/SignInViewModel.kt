@@ -1,4 +1,4 @@
-package com.example.studienarbeit.presentation.screens.signin
+package com.example.studienarbeit.presentation.signin
 
 import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -10,7 +10,7 @@ class SignInViewModel:ViewModel() {
     private val _state = MutableStateFlow(SignInState())
     val state = _state.asStateFlow()
 
-    fun onSignInResult(result:SignInResult){
+    fun onSignInResult(result: SignInResult){
         _state.update { it.copy(
             isSignedInSuccessfull = result.data != null,
             signInError = result.errorMessage
