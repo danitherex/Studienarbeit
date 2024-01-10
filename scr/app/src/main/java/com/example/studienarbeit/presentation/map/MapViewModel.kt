@@ -6,10 +6,13 @@ import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.studienarbeit.domain.model.Response
+import com.example.studienarbeit.domain.repository.GeofencingRepository
 import com.example.studienarbeit.domain.use_case.GetLocation
 import com.example.studienarbeit.domain.use_case.UseCases
 import com.example.studienarbeit.presentation.map.states.LocationState
 import com.example.studienarbeit.presentation.map.states.MarkersState
+import com.google.android.gms.location.Geofence
+import com.google.android.gms.maps.model.LatLng
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -23,7 +26,8 @@ import javax.inject.Inject
 @HiltViewModel
 class MapViewModel @Inject constructor(
     private val getLocationUseCase: GetLocation,
-    private val useCases: UseCases
+    private val useCases: UseCases,
+    private val geofencingHelper : GeofencingRepository
     ) : ViewModel() {
 
 
@@ -73,6 +77,18 @@ class MapViewModel @Inject constructor(
                 when(markers){
                     is Response.Success -> {
                         _markersState.value = MarkersState.Success(markers.data)
+                        val list = mutableListOf<Geofence>().apply {
+                            markers.data.forEach { markerData ->
+                                add(geofencingHelper.createGeofence(
+                                    LatLng(markerData.position.latitude, markerData.position.longitude),
+                                    100f,
+                                    Geofence.GEOFENCE_TRANSITION_ENTER ,
+                                    markerData.id
+                                ))
+                            }
+                        }
+
+                        geofencingHelper.setGeofence(list)
                     }
                     is Response.Error -> {
                         Log.d("MapViewModel", "getNotes: ${markers.message}")

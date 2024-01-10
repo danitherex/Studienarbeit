@@ -13,13 +13,19 @@ class MyApp : Application() {
     override fun onCreate() {
         super.onCreate()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(
+            val locationChannel = NotificationChannel(
                 "location",
                 "Location Notifications",
                 NotificationManager.IMPORTANCE_DEFAULT
             )
+            val geofenceChannel = NotificationChannel(
+                "geofence",
+                "Geofence Notifications",
+                NotificationManager.IMPORTANCE_HIGH
+            )
+            val notifications = mutableListOf(locationChannel,geofenceChannel)
             val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            notificationManager.createNotificationChannel(channel)
+            notificationManager.createNotificationChannels(notifications)
         }
     }
 }
