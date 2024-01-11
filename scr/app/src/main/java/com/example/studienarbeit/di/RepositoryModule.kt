@@ -37,8 +37,9 @@ object RepositoryModule {
     @Singleton
     @Provides
     fun provideMarkerRepository(
-        collection: CollectionReference
-    ): MarkerRepository = MarkerRepositoryImpl(collection)
+        collection: CollectionReference,
+        @ApplicationContext context: Context
+    ): MarkerRepository = MarkerRepositoryImpl(collection,context)
 
     @Singleton
     @Provides
@@ -60,4 +61,5 @@ object RepositoryModule {
         context,
         geofencingClient
     )
+
 }

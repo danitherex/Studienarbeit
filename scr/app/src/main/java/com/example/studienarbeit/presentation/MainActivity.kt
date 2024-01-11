@@ -42,7 +42,6 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 
-val Context.datastore by dataStore("app-settings.json", AppSettingsSerializer)
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {

@@ -1,13 +1,14 @@
 package com.example.studienarbeit.domain.repository
 
 import android.app.PendingIntent
+import com.example.studienarbeit.domain.model.MarkerModel
 import com.google.android.gms.location.Geofence
 import com.google.android.gms.maps.model.LatLng
 
 interface GeofencingRepository {
 
-    fun setGeofence(geofences:MutableList<Geofence>)
+    suspend fun setGeofence(markers:List<MarkerModel>)
 
-    fun createGeofence(latLng: LatLng, radius: Float, transitionTypes: Int,id:String): Geofence
+    suspend fun removeAllGeofences()
 
 }

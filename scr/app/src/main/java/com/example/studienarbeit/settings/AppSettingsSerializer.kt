@@ -1,6 +1,9 @@
 package com.example.studienarbeit.settings
 
+import android.content.Context
+import androidx.datastore.core.DataStore
 import androidx.datastore.core.Serializer
+import androidx.datastore.dataStore
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
 import java.io.InputStream
@@ -30,5 +33,6 @@ object AppSettingsSerializer:Serializer<AppSettings> {
             ).encodeToByteArray()
         )
     }
-
 }
+
+val Context.datastore: DataStore<AppSettings> by dataStore("app-settings.json", AppSettingsSerializer)

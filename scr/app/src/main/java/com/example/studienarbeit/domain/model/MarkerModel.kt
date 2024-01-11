@@ -1,7 +1,11 @@
 package com.example.studienarbeit.domain.model
 
+import com.example.studienarbeit.serializer.GeoPointSerializer
+import com.google.firebase.firestore.DocumentId
 import com.google.firebase.firestore.GeoPoint
+import kotlinx.serialization.Serializable
 
-data class MarkerModel(val id:String,val title:String, val description:String, val position:GeoPoint,val type:String) {
-    constructor():this("","","",GeoPoint(0.0,0.0),"")
+@Serializable
+data class MarkerModel(@DocumentId val id:String, val title:String, val description:String, @Serializable(with = GeoPointSerializer::class) val position:GeoPoint, val type:String) {
+    constructor():this("","","", GeoPoint(0.0,0.0),"")
 }

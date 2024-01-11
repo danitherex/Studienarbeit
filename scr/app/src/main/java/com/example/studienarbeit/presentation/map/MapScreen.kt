@@ -14,8 +14,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.LocationOff
-import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material.icons.outlined.MyLocation
 import androidx.compose.material.icons.outlined.PersonOutline
 import androidx.compose.material3.BottomAppBar
@@ -41,13 +39,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.example.studienarbeit.settings.AppSettings
 import com.example.studienarbeit.R
 import com.example.studienarbeit.data.repository.hasLocationPermission
-import com.example.studienarbeit.presentation.datastore
 import com.example.studienarbeit.presentation.map.components.MapComponent
 import com.example.studienarbeit.presentation.map.components.RationaleAlert
 import com.example.studienarbeit.presentation.map.states.LocationState
+import com.example.studienarbeit.settings.AppSettings
+import com.example.studienarbeit.settings.datastore
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -61,7 +59,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun MapScreen(
     viewModel: MapViewModel,
-    navigateTo: () -> Unit
+    navigateTo: () -> Unit,
 ) {
     val context = LocalContext.current
     val viewState by viewModel.locationState.collectAsStateWithLifecycle()
@@ -189,7 +187,7 @@ fun MapScreen(
                                     .fillMaxSize(),
                                 horizontalArrangement = Arrangement.SpaceEvenly,
                             ) {
-                                IconButton(onClick = {
+                                /*IconButton(onClick = {
                                     Intent(context, LocationService::class.java).apply {
                                         this.action = LocationService.ACTION_START
                                         context.startService(this)
@@ -210,6 +208,13 @@ fun MapScreen(
                                         imageVector = Icons.Outlined.LocationOff,
                                         contentDescription = "Stop LocationService"
                                     )
+                                }*/
+                                Button(onClick = {
+                                    scope.launch {
+                                        viewModel.geofencingHelper.removeAllGeofences()
+                                    }
+                                }) {
+                                    Text("Remove all geofences")
                                 }
                             }
                         }
@@ -245,7 +250,7 @@ fun MapScreen(
 
 
 private suspend fun CameraPositionState.centerOnLocation(
-    location: LatLng
+    location: LatLng,
 ) = animate(
     update = CameraUpdateFactory.newLatLngZoom(
         location,

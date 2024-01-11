@@ -10,7 +10,7 @@ import androidx.compose.ui.layout.layout
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.dp
-import com.example.studienarbeit.presentation.datastore
+import com.example.studienarbeit.settings.datastore
 import kotlinx.coroutines.launch
 
 @Composable

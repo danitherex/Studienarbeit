@@ -27,7 +27,7 @@ import javax.inject.Inject
 class MapViewModel @Inject constructor(
     private val getLocationUseCase: GetLocation,
     private val useCases: UseCases,
-    private val geofencingHelper : GeofencingRepository
+    val geofencingHelper : GeofencingRepository,
     ) : ViewModel() {
 
 
@@ -77,18 +77,8 @@ class MapViewModel @Inject constructor(
                 when(markers){
                     is Response.Success -> {
                         _markersState.value = MarkersState.Success(markers.data)
-                        val list = mutableListOf<Geofence>().apply {
-                            markers.data.forEach { markerData ->
-                                add(geofencingHelper.createGeofence(
-                                    LatLng(markerData.position.latitude, markerData.position.longitude),
-                                    100f,
-                                    Geofence.GEOFENCE_TRANSITION_ENTER ,
-                                    markerData.id
-                                ))
-                            }
-                        }
 
-                        geofencingHelper.setGeofence(list)
+                        geofencingHelper.setGeofence(markers.data)
                     }
                     is Response.Error -> {
                         Log.d("MapViewModel", "getNotes: ${markers.message}")
