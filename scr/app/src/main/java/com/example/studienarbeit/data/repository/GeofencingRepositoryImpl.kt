@@ -5,7 +5,7 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.util.Log
-import com.example.studienarbeit.GeofenceBroadcastReceiver
+import com.example.studienarbeit.services.GeofenceBroadcastReceiver
 import com.example.studienarbeit.domain.model.MarkerModel
 import com.example.studienarbeit.domain.repository.GeofencingRepository
 import com.example.studienarbeit.settings.datastore
@@ -38,20 +38,17 @@ class GeofencingRepositoryImpl @Inject constructor(
             .setExpirationDuration(Geofence.NEVER_EXPIRE)
             .setTransitionTypes(transitionTypes)
             .setRequestId(id)
-            //TODO: set expiration duration
-            //.setExpirationDuration(Geofence.NEVER_EXPIRE)
-            .setExpirationDuration(86400000)
+            .setExpirationDuration(Geofence.NEVER_EXPIRE)
             .build()
     }
 
     @SuppressLint("MissingPermission")
-    //TODO: save current geofences in datastore to retrieve after boot and to not add them again
     override suspend fun setGeofence(markers: List<MarkerModel>) {
         val appstore = context.datastore.data
         val pendingIntent = getGeofencePendingIntent()
 
-        val geofences: List<Geofence>;
-        val geofencesToRemove: List<String>;
+        val geofences: List<Geofence>
+        val geofencesToRemove: List<String>
 
         val appStoreValues = runBlocking { appstore.first() }
         val geofencesFromAppstore = appStoreValues.geofences
@@ -108,6 +105,63 @@ class GeofencingRepositoryImpl @Inject constructor(
                             it.copy(
                                 geofences = geofences.map { it.requestId } + geofencesFromAppstore.filter { geofenceId ->
                                     geofencesToRemove.none { it == geofenceId }
+                                }
+
+                            )
+                        }
+                    }
+
+                    Log.d("GEOFENCE", "Added ${geofences.size} Geofences")
+                }
+                .addOnFailureListener { e ->
+                    Log.d("GEOFENCE", "Failed to add ${geofences.size} Geofences: $e")
+                }
+        }
+    }
+    @SuppressLint("MissingPermission")//TODO: check if permission is missing
+    override suspend fun addMarkersAsGeofences(){
+        val appstore = context.datastore.data
+        val pendingIntent = getGeofencePendingIntent()
+
+        val markers = appstore.first().markers
+        val radius = appstore.first().radius.toFloat()
+
+        val geofences = markers
+            .map {
+                createGeofence(
+                    LatLng(it.position.latitude, it.position.longitude),
+                    radius,
+                    Geofence.GEOFENCE_TRANSITION_ENTER,
+                    it.id
+                )
+            }
+
+        geofencingClient.removeGeofences(pendingIntent)
+            .addOnSuccessListener {
+                Log.d("GEOFENCE", "Removed all Geofences ...")
+                CoroutineScope(Dispatchers.Main).launch {
+                    context.datastore.updateData { it ->
+                        it.copy(
+                            geofences = emptyList()
+                        )
+                    }
+                }
+            }
+            .addOnFailureListener { e -> Log.d("GEOFENCE", "Failed to remove all Geofences: $e") }
+
+        if (geofences.isNotEmpty()) {
+            val geofencingRequest = GeofencingRequest.Builder()
+                .addGeofences(geofences)
+                .build()
+
+            geofencingClient.addGeofences(geofencingRequest, pendingIntent)
+                .addOnSuccessListener {
+                    CoroutineScope(Dispatchers.Main).launch {
+                        Log.d("GEOFENCE", "Added ${geofences.size} Geofences to datastore ...")
+                        context.datastore.updateData { it ->
+                            it.copy(
+                                geofences = geofences.map {
+                                    it.requestId
                                 }
 
                             )

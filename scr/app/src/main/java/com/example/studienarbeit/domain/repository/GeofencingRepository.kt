@@ -1,9 +1,6 @@
 package com.example.studienarbeit.domain.repository
 
-import android.app.PendingIntent
 import com.example.studienarbeit.domain.model.MarkerModel
-import com.google.android.gms.location.Geofence
-import com.google.android.gms.maps.model.LatLng
 
 interface GeofencingRepository {
 
@@ -12,5 +9,7 @@ interface GeofencingRepository {
     suspend fun removeAllGeofences()
 
     suspend fun updateRadius(radius:Float)
+
+    suspend fun addMarkersAsGeofences()
 
 }

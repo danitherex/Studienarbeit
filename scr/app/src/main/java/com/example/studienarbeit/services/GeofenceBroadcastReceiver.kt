@@ -1,4 +1,4 @@
-package com.example.studienarbeit
+package com.example.studienarbeit.services
 
 import android.app.Notification
 import android.content.BroadcastReceiver
@@ -9,6 +9,7 @@ import android.util.Log
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import com.example.studienarbeit.R
 import com.example.studienarbeit.presentation.map.components.Icons
 import com.example.studienarbeit.settings.datastore
 import com.example.studienarbeit.utils.Constants.GEOFENCE_CHANNEL_ID
@@ -20,7 +21,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import okhttp3.internal.notify
 
 class GeofenceBroadcastReceiver : BroadcastReceiver() {
 
