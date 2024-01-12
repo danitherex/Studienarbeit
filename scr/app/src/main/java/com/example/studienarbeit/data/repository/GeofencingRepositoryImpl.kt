@@ -106,7 +106,6 @@ class GeofencingRepositoryImpl @Inject constructor(
                         Log.d("GEOFENCE", "Added ${geofences.size} Geofences to datastore ...")
                         context.datastore.updateData { it ->
                             it.copy(
-                                //geofences = geofences.map { it.requestId }
                                 geofences = geofences.map { it.requestId } + geofencesFromAppstore.filter { geofenceId ->
                                     geofencesToRemove.none { it == geofenceId }
                                 }
@@ -147,6 +146,63 @@ class GeofencingRepositoryImpl @Inject constructor(
                     "Failed to remove all Geofences: $e"
                 )
             }
+    }
+
+    @SuppressLint("MissingPermission")
+    override suspend fun updateRadius(radius: Float) {
+        val appstore = context.datastore.data
+        val pendingIntent = getGeofencePendingIntent()
+
+        val markers = appstore.first().markers
+
+        val geofences = markers
+            .map {
+                createGeofence(
+                    LatLng(it.position.latitude, it.position.longitude),
+                    radius,
+                    Geofence.GEOFENCE_TRANSITION_ENTER,
+                    it.id
+                )
+            }
+
+        geofencingClient.removeGeofences(pendingIntent)
+            .addOnSuccessListener {
+                Log.d("GEOFENCE", "Removed all Geofences ...")
+                CoroutineScope(Dispatchers.Main).launch {
+                    context.datastore.updateData { it ->
+                        it.copy(
+                            geofences = emptyList()
+                        )
+                    }
+                }
+            }
+            .addOnFailureListener { e -> Log.d("GEOFENCE", "Failed to remove all Geofences: $e") }
+
+        if (geofences.isNotEmpty()) {
+            val geofencingRequest = GeofencingRequest.Builder()
+                .addGeofences(geofences)
+                .build()
+
+            geofencingClient.addGeofences(geofencingRequest, pendingIntent)
+                .addOnSuccessListener {
+                    CoroutineScope(Dispatchers.Main).launch {
+                        Log.d("GEOFENCE", "Added ${geofences.size} Geofences to datastore ...")
+                        context.datastore.updateData { it ->
+                            it.copy(
+                                geofences = geofences.map {
+                                    it.requestId
+                                }
+
+                            )
+                        }
+                    }
+
+                    Log.d("GEOFENCE", "Added ${geofences.size} Geofences")
+                }
+                .addOnFailureListener { e ->
+                    Log.d("GEOFENCE", "Failed to add ${geofences.size} Geofences: $e")
+                }
+        }
     }
 
 

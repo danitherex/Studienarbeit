@@ -22,6 +22,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.studienarbeit.presentation.map.states.BootomSheetState
 import com.example.studienarbeit.presentation.map.states.MarkersState
+import com.google.android.gms.maps.model.Dot
+import com.google.android.gms.maps.model.Gap
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.CameraPositionState
 import com.google.maps.android.compose.Circle
@@ -38,15 +40,16 @@ fun MapComponent(
     cameraState: CameraPositionState,
     markers: State<MarkersState>,
     innerPadding: PaddingValues,
-    radius:Double
-    ) {
+    radius: Double,
+    previewRadius: Double,
+    showPreview: Boolean,
+) {
+
     var showBottomSheet by remember { mutableStateOf(false) }
     var bottomSheetState by remember { mutableStateOf(BootomSheetState("", "")) }
 
     val sheetState = rememberModalBottomSheetState()
     val scope = rememberCoroutineScope()
-
-
 
     Column(
         modifier = Modifier
@@ -112,6 +115,14 @@ fun MapComponent(
                 radius = radius,
                 strokeWidth = 20.0F,
 
+                )
+            if (showPreview)
+                Circle(
+                    center = currentPosition,
+                    strokeColor = Color.Magenta,
+                    radius = previewRadius,
+                    strokeWidth = 10.0F,
+                    strokePattern = listOf(Dot(), Gap(10.0f)),
                 )
         }
     }

@@ -10,10 +10,15 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Check
+import androidx.compose.material.icons.outlined.Close
+import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.MyLocation
 import androidx.compose.material.icons.outlined.PersonOutline
 import androidx.compose.material3.BottomAppBar
@@ -63,6 +68,8 @@ fun MapScreen(
 ) {
     val context = LocalContext.current
     val viewState by viewModel.locationState.collectAsStateWithLifecycle()
+    val showPreviewState = viewModel.showPreviewState.collectAsStateWithLifecycle()
+
 
     val permissionState = rememberMultiplePermissionsState(
         permissions = listOf(
@@ -141,6 +148,7 @@ fun MapScreen(
                 val scope = rememberCoroutineScope()
                 val cameraState = rememberCameraPositionState()
                 val bool = rememberSaveable { true }
+                val previewRadius = viewModel.previewRadius
 
                 val appSettings =
                     context.datastore.data.collectAsState(initial = AppSettings())
@@ -154,12 +162,56 @@ fun MapScreen(
                     modifier = Modifier
                         .fillMaxSize(),
                     floatingActionButton = {
-                        FloatingActionButton(onClick = {
-                            scope.launch {
-                                cameraState.centerOnLocation(currentLoc)
+                        Column {
+                            if (showPreviewState.value) {
+                                FloatingActionButton(
+                                    containerColor = Color.Red,
+                                    onClick = {
+                                        viewModel.togglePreview()
+                                    }) {
+                                    Icon(Icons.Outlined.Close, "MyLocation floating action button")
+                                }
+                                Spacer(modifier = Modifier.height(8.dp))
                             }
-                        }) {
-                            Icon(Icons.Outlined.MyLocation, "MyLocation floating action button")
+                            FloatingActionButton(
+                                containerColor = if (showPreviewState.value) Color.Green else Color.Blue,
+                                onClick = {
+                                    if (showPreviewState.value) {
+                                        scope.launch {
+                                            if (previewRadius.doubleValue != appSettings.value.radius) {
+                                                viewModel.geofencingHelper.updateRadius(
+                                                    previewRadius.doubleValue.toFloat()
+                                                )
+                                                context.datastore.updateData {
+                                                    it.copy(
+                                                        radius = previewRadius.doubleValue
+                                                    )
+                                                }
+                                            }
+                                        }
+                                    }
+                                    viewModel.togglePreview()
+                                }) {
+                                Icon(
+                                    if (showPreviewState.value) Icons.Outlined.Check else Icons.Outlined.Edit,
+                                    "MyLocation floating action button"
+                                )
+                            }
+                            Spacer(modifier = Modifier.height(8.dp))
+                            FloatingActionButton(
+                                containerColor = Color.Blue,
+                                onClick = {
+                                    scope.launch {
+                                        cameraState.centerOnLocation(currentLoc)
+                                    }
+                                }) {
+                                Icon(
+                                    Icons.Outlined.MyLocation,
+                                    "MyLocation floating action button"
+                                )
+                            }
+
+
                         }
                     },
                     topBar = {
@@ -187,28 +239,6 @@ fun MapScreen(
                                     .fillMaxSize(),
                                 horizontalArrangement = Arrangement.SpaceEvenly,
                             ) {
-                                /*IconButton(onClick = {
-                                    Intent(context, LocationService::class.java).apply {
-                                        this.action = LocationService.ACTION_START
-                                        context.startService(this)
-                                    }
-                                }) {
-                                    Icon(
-                                        imageVector = Icons.Outlined.LocationOn,
-                                        contentDescription = "Start LocationService"
-                                    )
-                                }
-                                IconButton(onClick = {
-                                    Intent(context, LocationService::class.java).apply {
-                                        this.action = LocationService.ACTION_STOP
-                                        context.startService(this)
-                                    }
-                                }) {
-                                    Icon(
-                                        imageVector = Icons.Outlined.LocationOff,
-                                        contentDescription = "Stop LocationService"
-                                    )
-                                }*/
                                 Button(onClick = {
                                     scope.launch {
                                         viewModel.geofencingHelper.removeAllGeofences()
@@ -234,11 +264,14 @@ fun MapScreen(
                             innerPadding = innerPadding,
                             cameraState = cameraState,
                             markers = viewModel.markersState.collectAsState(),
-                            radius = appSettings.value.radius
+                            radius = appSettings.value.radius,
+                            previewRadius = previewRadius.value,
+                            showPreview = showPreviewState.value
                         )
-                        RadiusSlider(
-                            radius = appSettings.value.radius
-                        )
+                        if (showPreviewState.value)
+                            RadiusSlider(
+                                radius = previewRadius
+                            )
                     }
                 }
 

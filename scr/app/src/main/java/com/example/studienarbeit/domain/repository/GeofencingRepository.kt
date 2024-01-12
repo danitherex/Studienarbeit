@@ -11,4 +11,6 @@ interface GeofencingRepository {
 
     suspend fun removeAllGeofences()
 
+    suspend fun updateRadius(radius:Float)
+
 }
