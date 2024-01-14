@@ -65,13 +65,7 @@ class LocationRepositoryImpl @Inject constructor(
         }
     }
 
-    override fun requestCurrentLocation(): Flow<LatLng?> {
-        TODO("Not yet implemented")
-    }
-
 }
-
-
 fun Context.hasLocationPermission(): Boolean {
     return ContextCompat.checkSelfPermission(
         this,

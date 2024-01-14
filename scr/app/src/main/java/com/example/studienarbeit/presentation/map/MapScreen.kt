@@ -1,10 +1,7 @@
 package com.example.studienarbeit.presentation.map
 
 import RadiusSlider
-import android.Manifest
-import android.content.Intent
 import android.os.Build
-import android.provider.Settings
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -13,8 +10,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material.icons.outlined.Close
@@ -47,20 +42,18 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.studienarbeit.R
 import com.example.studienarbeit.data.repository.hasLocationPermission
 import com.example.studienarbeit.presentation.map.components.MapComponent
-import com.example.studienarbeit.presentation.map.components.RationaleAlert
 import com.example.studienarbeit.presentation.map.states.LocationState
 import com.example.studienarbeit.settings.AppSettings
 import com.example.studienarbeit.settings.datastore
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
-import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.CameraPositionState
 import com.google.maps.android.compose.rememberCameraPositionState
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalPermissionsApi::class, ExperimentalMaterial3Api::class)
-@RequiresApi(Build.VERSION_CODES.S)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Composable
 fun MapScreen(
     viewModel: MapViewModel,
@@ -70,36 +63,11 @@ fun MapScreen(
     val viewState by viewModel.locationState.collectAsStateWithLifecycle()
     val showPreviewState = viewModel.showPreviewState.collectAsStateWithLifecycle()
 
-
-    val permissionState = rememberMultiplePermissionsState(
-        permissions = listOf(
-            Manifest.permission.ACCESS_FINE_LOCATION,
-            Manifest.permission.ACCESS_COARSE_LOCATION
-        )
-    )
-
-    LaunchedEffect(!context.hasLocationPermission()) {
-        permissionState.launchMultiplePermissionRequest()
-    }
-
-    when {
-        permissionState.allPermissionsGranted -> {
-            LaunchedEffect(Unit) {
-                viewModel.handle(PermissionEvent.Granted)
-            }
-        }
-
-        permissionState.shouldShowRationale -> {
-            RationaleAlert(onDismiss = { }) {
-                permissionState.launchMultiplePermissionRequest()
-            }
-        }
-
-        !permissionState.allPermissionsGranted && !permissionState.shouldShowRationale -> {
-            LaunchedEffect(Unit) {
-                viewModel.handle(PermissionEvent.Revoked)
-            }
-        }
+    LaunchedEffect(context.hasLocationPermission()){
+        if(context.hasLocationPermission())
+            viewModel.handle(PermissionEvent.Granted)
+        else
+            viewModel.handle(PermissionEvent.Revoked)
     }
 
     with(viewState) {
@@ -115,26 +83,11 @@ fun MapScreen(
 
             LocationState.RevokedPermissions -> {
 
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(24.dp),
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
                 ) {
-                    Text("We need permissions to use this app")
-                    Button(
-                        onClick = {
-                            context.startActivity(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS))
-                        },
-                        enabled = !context.hasLocationPermission()
-                    ) {
-                        if (context.hasLocationPermission()) CircularProgressIndicator(
-                            modifier = Modifier.size(14.dp),
-                            color = Color.White
-                        )
-                        else Text("Settings")
-                    }
+                    Text(text = "Permissions revoked")
                 }
             }
 
@@ -169,7 +122,10 @@ fun MapScreen(
                                     onClick = {
                                         viewModel.togglePreview()
                                     }) {
-                                    Icon(Icons.Outlined.Close, "MyLocation floating action button")
+                                    Icon(
+                                        Icons.Outlined.Close,
+                                        "MyLocation floating action button"
+                                    )
                                 }
                                 Spacer(modifier = Modifier.height(8.dp))
                             }
@@ -265,7 +221,7 @@ fun MapScreen(
                             cameraState = cameraState,
                             markers = viewModel.markersState.collectAsState(),
                             radius = appSettings.value.radius,
-                            previewRadius = previewRadius.value,
+                            previewRadius = previewRadius.doubleValue,
                             showPreview = showPreviewState.value
                         )
                         if (showPreviewState.value)
@@ -280,7 +236,6 @@ fun MapScreen(
     }
 
 }
-
 
 private suspend fun CameraPositionState.centerOnLocation(
     location: LatLng,

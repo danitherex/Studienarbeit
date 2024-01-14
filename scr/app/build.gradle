@@ -89,9 +89,10 @@ dependencies {
     implementation("com.google.firebase:firebase-auth")
     implementation("com.google.android.gms:play-services-auth:20.7.0")
 
-    implementation  "androidx.datastore:datastore:1.0.0"
-    implementation  "org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.2"
+    implementation "androidx.datastore:datastore:1.0.0"
+    implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.2"
 
+    implementation "androidx.compose.ui:ui-text-google-fonts:1.5.4"
 
 
 
@@ -101,7 +102,7 @@ kapt {
     correctErrorTypes true
 }
 
-secrets{
+secrets {
     propertiesFileName = "secrets.properties"
     ignoreList.add("keyToIgnore")
     ignoreList.add("sdk.*")

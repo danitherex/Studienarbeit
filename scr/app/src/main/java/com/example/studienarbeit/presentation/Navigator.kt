@@ -16,6 +16,7 @@ class Navigator {
         MAP("Map"),
         LOGIN("Login"),
         PROFILE("Profile"),
+        PERMISSIONS("Permissions"),
         //TODO:make this better, maybe with objects :https://hitherejoe.medium.com/nested-navigation-graphs-in-jetpack-compose-dc0ada1d4726
         ROOT("Logged-in")
     }

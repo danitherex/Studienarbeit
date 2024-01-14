@@ -2,6 +2,7 @@ package com.example.studienarbeit.presentation
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.widget.Toast
@@ -17,8 +18,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.core.app.ActivityCompat
-import androidx.datastore.dataStore
+import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -30,10 +30,11 @@ import androidx.navigation.compose.rememberNavController
 import com.example.studienarbeit.domain.repository.GoogleAuthRepository
 import com.example.studienarbeit.presentation.map.MapScreen
 import com.example.studienarbeit.presentation.map.MapViewModel
+import com.example.studienarbeit.presentation.permissions.PermissionScreen
+import com.example.studienarbeit.presentation.permissions.PermissionViewModel
 import com.example.studienarbeit.presentation.profile.ProfileScreen
 import com.example.studienarbeit.presentation.signin.SignInScreen
 import com.example.studienarbeit.presentation.signin.SignInViewModel
-import com.example.studienarbeit.settings.AppSettingsSerializer
 import com.example.studienarbeit.ui.theme.StudienarbeitTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.launchIn
@@ -42,29 +43,16 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 
-
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
     @Inject
     lateinit var googleAuthUiClient: GoogleAuthRepository
 
-    @RequiresApi(Build.VERSION_CODES.S)
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     @SuppressLint("MissingPermission")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        //TODO: make better permission handling https://www.youtube.com/watch?v=D3JCtaK8LSU
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            ActivityCompat.requestPermissions(
-                this,
-                arrayOf(
-                    android.Manifest.permission.POST_NOTIFICATIONS
-                ),
-                0
-            )
-        }
-
 
 
         setContent {
@@ -92,7 +80,7 @@ class MainActivity : ComponentActivity() {
 
                             LaunchedEffect(key1 = Unit) {
                                 if (googleAuthUiClient.getSignedUser() != null) {
-                                    navController.navigate(Navigator.NavTarget.MAP.label)
+                                    navController.navigate(Navigator.NavTarget.PERMISSIONS.label)
                                 }
                             }
 
@@ -120,7 +108,7 @@ class MainActivity : ComponentActivity() {
                                         Toast.LENGTH_LONG
                                     ).show()
 
-                                    navController.navigate(Navigator.NavTarget.MAP.label)
+                                    navController.navigate(Navigator.NavTarget.PERMISSIONS.label)
                                     viewModel.resetState()
                                 }
                             }
@@ -137,6 +125,19 @@ class MainActivity : ComponentActivity() {
                                         )
                                     }
                                 })
+                        }
+                        composable(Navigator.NavTarget.PERMISSIONS.label) {
+                            val viewModel = viewModel<PermissionViewModel>()
+                            val permissionsGranted = viewModel.granted
+
+                            if (hasAppPermissions())
+                                navigator.navigateTo(Navigator.NavTarget.MAP)
+
+                            LaunchedEffect(permissionsGranted.value) {
+                                if (permissionsGranted.value)
+                                    navigator.navigateTo(Navigator.NavTarget.MAP)
+                            }
+                            PermissionScreen(viewModel)
                         }
                         navigation(
                             startDestination = Navigator.NavTarget.MAP.label,
@@ -182,6 +183,23 @@ class MainActivity : ComponentActivity() {
         }
 
     }
+}
+
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
+fun Context.hasAppPermissions(): Boolean {
+    return ContextCompat.checkSelfPermission(
+        this,
+        android.Manifest.permission.ACCESS_FINE_LOCATION
+    ) == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(
+        this,
+        android.Manifest.permission.ACCESS_COARSE_LOCATION
+    ) == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(
+        this,
+        android.Manifest.permission.POST_NOTIFICATIONS
+    ) == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(
+        this,
+        android.Manifest.permission.ACCESS_BACKGROUND_LOCATION
+    ) == PackageManager.PERMISSION_GRANTED
 }
 
 
