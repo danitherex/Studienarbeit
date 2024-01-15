@@ -1,0 +1,67 @@
+name: Deploy to Firebase
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_notes:
+        type: string
+        required: true
+        default: 'Manual Debug Build'
+        description: 'Release Notes'
+
+jobs:
+  build:
+    name: Building and distributing app
+    runs-on: ubuntu-latest
+    steps:
+
+      - uses: actions/checkout@v3
+
+      - name: Decode Keystore
+        id: decode_keystore
+        uses: timheuer/base64-to-file@v1.2
+        with:
+            fileName: 'keystore/studienarbeit.jks'
+            fileDir: "scr/app/"
+            encodedString: ${{ secrets.KEYSTORE }}
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+          cache: 'gradle'
+
+      - name: Load Google Service file
+        env:
+          DATA: ${{ secrets.GOOGLE_SERVICES_JSON }}
+        run: echo $DATA | base64 -di > scr/app/google-services.json
+
+      - name: Grand execute permissions to gradlew
+        run: chmod +x scr/gradlew
+
+      - name: build prod
+        run: ./scr/gradlew -p scr app:assembleRelease
+        env:
+          SIGNING_KEY_ALIAS: ${{ secrets.SIGNING_KEY_ALIAS }}
+          SIGNING_KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
+          SIGNING_STORE_PASSWORD: ${{ secrets.SIGNING_STORE_PASSWORD }}
+          MAPS_API_KEY: ${{ secrets.MAPS_API_KEY }}
+
+      - run: ls -la scr/app/build/outputs
+      - run: ls -la scr/app/build/outputs/apk/release
+
+
+      - name: Upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: Build Artifacts
+          path: scr/app/build/outputs/apk/release/app-release.apk
+
+      - name: Upload Artifact to Firebase App Distribution
+        uses: wzieba/Firebase-Distribution-Github-Action@v1
+        with:
+          appId: ${{ secrets.FIREBASE_APP_ID }}
+          serviceCredentialsFileContent: ${{ secrets.CREDENTIAL_FILE_CONTENT }}
+          groups: testers
+          file: scr/app/build/outputs/apk/release/app-release.apk
+          releaseNotes: ${{ inputs.release_notes }}
