@@ -1,4 +1,4 @@
-package com.example.studienarbeit.domain.use_case
+package com.example.studienarbeit.domain.use_case.marker
 
 import com.example.studienarbeit.domain.repository.MarkerRepository
 

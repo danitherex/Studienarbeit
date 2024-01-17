@@ -18,6 +18,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.core.view.WindowCompat
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -54,6 +55,8 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+
 
         setContent {
             StudienarbeitTheme {
@@ -72,10 +75,10 @@ class MainActivity : ComponentActivity() {
 
                     NavHost(
                         navController = navController,
-                        startDestination = Navigator.NavTarget.LOGIN.label
+                        startDestination = Navigator.NavTarget.SIGNIN.label
                     ) {
-                        composable(Navigator.NavTarget.LOGIN.label) {
-                            val viewModel = viewModel<SignInViewModel>()
+                        composable(Navigator.NavTarget.SIGNIN.label) {
+                            val viewModel = hiltViewModel<SignInViewModel>()
                             val state by viewModel.state.collectAsStateWithLifecycle()
 
                             LaunchedEffect(key1 = Unit) {
@@ -100,8 +103,8 @@ class MainActivity : ComponentActivity() {
                                 }
                             )
 
-                            LaunchedEffect(key1 = state.isSignedInSuccessfull) {
-                                if (state.isSignedInSuccessfull) {
+                            LaunchedEffect(key1 = state.isSignedUpSuccessful) {
+                                if (state.isSignedUpSuccessful) {
                                     Toast.makeText(
                                         applicationContext,
                                         "Sign in successful",
@@ -115,7 +118,8 @@ class MainActivity : ComponentActivity() {
 
                             SignInScreen(
                                 state = state,
-                                onSignInClick = {
+                                viewModel = viewModel,
+                                onSignUpWithGoogle = {
                                     lifecycleScope.launch {
                                         val signInIntentSender = googleAuthUiClient.signIn()
                                         launcher.launch(
@@ -126,6 +130,7 @@ class MainActivity : ComponentActivity() {
                                     }
                                 })
                         }
+
                         composable(Navigator.NavTarget.PERMISSIONS.label) {
                             val viewModel = viewModel<PermissionViewModel>()
                             val permissionsGranted = viewModel.granted
@@ -166,7 +171,7 @@ class MainActivity : ComponentActivity() {
                                                 Toast.LENGTH_LONG
                                             ).show()
 
-                                            navController.navigate(Navigator.NavTarget.LOGIN.label)
+                                            navController.navigate(Navigator.NavTarget.SIGNIN.label)
                                         }
                                     },
                                     navigateBack = {

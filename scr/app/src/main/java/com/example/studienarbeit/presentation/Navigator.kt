@@ -14,7 +14,7 @@ class Navigator {
 
     enum class NavTarget(val label:String){
         MAP("Map"),
-        LOGIN("Login"),
+        SIGNIN("SignIn"),
         PROFILE("Profile"),
         PERMISSIONS("Permissions"),
         //TODO:make this better, maybe with objects :https://hitherejoe.medium.com/nested-navigation-graphs-in-jetpack-compose-dc0ada1d4726

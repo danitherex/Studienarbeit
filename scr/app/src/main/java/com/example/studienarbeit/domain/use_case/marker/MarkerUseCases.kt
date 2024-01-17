@@ -1,6 +1,6 @@
-package com.example.studienarbeit.domain.use_case
+package com.example.studienarbeit.domain.use_case.marker
 
-data class UseCases (
+data class MarkerUseCases (
     val addMarker: AddMarker,
     val deleteMarker: DeleteMarker,
     val getMarkers: GetMarkers,

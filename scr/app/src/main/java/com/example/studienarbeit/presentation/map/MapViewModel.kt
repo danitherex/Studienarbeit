@@ -10,7 +10,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.studienarbeit.domain.model.Response
 import com.example.studienarbeit.domain.repository.GeofencingRepository
 import com.example.studienarbeit.domain.use_case.GetLocation
-import com.example.studienarbeit.domain.use_case.UseCases
+import com.example.studienarbeit.domain.use_case.marker.MarkerUseCases
 import com.example.studienarbeit.presentation.map.states.LocationState
 import com.example.studienarbeit.presentation.map.states.MarkersState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -26,7 +26,7 @@ import javax.inject.Inject
 @HiltViewModel
 class MapViewModel @Inject constructor(
     private val getLocationUseCase: GetLocation,
-    private val useCases: UseCases,
+    private val markerUseCases: MarkerUseCases,
     val geofencingHelper: GeofencingRepository,
 ) : ViewModel() {
 
@@ -59,7 +59,7 @@ class MapViewModel @Inject constructor(
         when (event) {
             is MarkersEvents.DeleteMarker -> {
                 viewModelScope.launch {
-                    useCases.deleteMarker(event.id)
+                    markerUseCases.deleteMarker(event.id)
                 }
             }
         }
@@ -84,7 +84,7 @@ class MapViewModel @Inject constructor(
 
     private fun getNotes() {
         getNotesJob?.cancel()
-        getNotesJob = useCases.getMarkers()
+        getNotesJob = markerUseCases.getMarkers()
             .onEach { markers ->
                 when (markers) {
                     is Response.Success -> {

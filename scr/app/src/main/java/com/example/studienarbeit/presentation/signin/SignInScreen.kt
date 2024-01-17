@@ -1,42 +1,35 @@
 package com.example.studienarbeit.presentation.signin
 
-import android.widget.Toast
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.dp
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 
 @Composable
-fun SignInScreen (
-    state: SignInState,
-    onSignInClick:()->Unit
-){
-    val context = LocalContext.current
-    LaunchedEffect(key1 = state.signInError){
-        state.signInError?.let { error->
-            Toast.makeText(
-                context,
-                error,
-                Toast.LENGTH_SHORT
-            ).show()
-        }
-    }
+fun SignInScreen(
+    state: SignUpState,
+    viewModel: SignInViewModel,
+    onSignUpWithGoogle: () -> Unit,
+) {
+    var signUp by remember { mutableStateOf(true) }
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        contentAlignment = Alignment.Center,
-    ){
-        Button(onClick = onSignInClick) {
-            Text(text = "Sign in")
-        }
+    fun switchScreen() { signUp = !signUp }
+
+    if (signUp) {
+        SignUpScreen(
+            state = state,
+            viewModel = viewModel,
+            onSignUpWithGoogle = onSignUpWithGoogle,
+            navigateToLogin = ::switchScreen
+        )
+    }
+    else {
+        LoginScreen(
+            state = state,
+            viewModel = viewModel,
+            onLoginWithGoogle = onSignUpWithGoogle,
+            navigateToSignUp = ::switchScreen
+        )
     }
 }

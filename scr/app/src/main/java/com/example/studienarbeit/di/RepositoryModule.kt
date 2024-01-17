@@ -1,10 +1,12 @@
 package com.example.studienarbeit.di
 
 import android.content.Context
+import com.example.studienarbeit.data.repository.EmailAuthRepositoryImpl
 import com.example.studienarbeit.data.repository.GeofencingRepositoryImpl
 import com.example.studienarbeit.data.repository.GoogleAuthRepositoryImpl
 import com.example.studienarbeit.data.repository.LocationRepositoryImpl
 import com.example.studienarbeit.data.repository.MarkerRepositoryImpl
+import com.example.studienarbeit.domain.repository.EmailAuthRepository
 import com.example.studienarbeit.domain.repository.GeofencingRepository
 import com.example.studienarbeit.domain.repository.GoogleAuthRepository
 import com.example.studienarbeit.domain.repository.LocationRepository
@@ -54,6 +56,14 @@ object RepositoryModule {
 
     @Singleton
     @Provides
+    fun provideEmailAuth(
+        auth:FirebaseAuth
+    ): EmailAuthRepository = EmailAuthRepositoryImpl(
+        auth
+    )
+
+    @Singleton
+    @Provides
     fun provideGeoFencingRepository(
         @ApplicationContext context:Context,
         geofencingClient : GeofencingClient
@@ -61,5 +71,7 @@ object RepositoryModule {
         context,
         geofencingClient
     )
+
+
 
 }
