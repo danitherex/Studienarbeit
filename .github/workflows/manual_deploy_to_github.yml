@@ -1,0 +1,57 @@
+name: Deploy to Github
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_notes:
+        type: string
+        required: true
+        default: 'Manual Debug Build'
+        description: 'Release Notes'
+
+jobs:
+  build:
+    name: Building and distributing app
+    runs-on: ubuntu-latest
+    steps:
+
+      - uses: actions/checkout@v3
+
+      - name: Decode Keystore
+        id: decode_keystore
+        uses: timheuer/base64-to-file@v1.2
+        with:
+            fileName: 'keystore/studienarbeit.jks'
+            fileDir: "scr/app/"
+            encodedString: ${{ secrets.KEYSTORE }}
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+          cache: 'gradle'
+
+      - name: Load Google Service file
+        env:
+          DATA: ${{ secrets.GOOGLE_SERVICES_JSON }}
+        run: echo $DATA | base64 -di > scr/app/google-services.json
+
+      - name: Append MAPS_API_KEY to secrets.defaults.properties
+        run: echo "MAPS_API_KEY=${{ secrets.MAPS_API_KEY }}" >> scr/secrets.defaults.properties
+
+      - name: Grand execute permissions to gradlew
+        run: chmod +x scr/gradlew
+
+      - name: build prod
+        run: ./scr/gradlew -p scr app:assembleRelease
+        env:
+          SIGNING_KEY_ALIAS: ${{ secrets.SIGNING_KEY_ALIAS }}
+          SIGNING_KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
+          SIGNING_STORE_PASSWORD: ${{ secrets.SIGNING_STORE_PASSWORD }}
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: scr/app/build/outputs/apk/release/app-release.apk
+        env:
+          GITHUB_TOKEN: ${{ secrets.G_TOKEN }}
