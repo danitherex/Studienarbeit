@@ -222,7 +222,12 @@ fun MapScreen(
                             markers = viewModel.markersState.collectAsState(),
                             radius = appSettings.value.radius,
                             previewRadius = previewRadius.doubleValue,
-                            showPreview = showPreviewState.value
+                            showPreview = showPreviewState.value,
+                            centreOnLocation = {
+                                scope.launch {
+                                    cameraState.centerOnLocation(it)
+                                }
+                            },
                         )
                         if (showPreviewState.value)
                             RadiusSlider(
