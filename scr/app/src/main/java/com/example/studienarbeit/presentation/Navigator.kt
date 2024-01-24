@@ -18,6 +18,7 @@ class Navigator {
         PROFILE("Profile"),
         PERMISSIONS("Permissions"),
         //TODO:make this better, maybe with objects :https://hitherejoe.medium.com/nested-navigation-graphs-in-jetpack-compose-dc0ada1d4726
-        ROOT("Logged-in")
+        ROOT("Logged-in"),
+        ADD_MARKER("AddMarker")
     }
 }

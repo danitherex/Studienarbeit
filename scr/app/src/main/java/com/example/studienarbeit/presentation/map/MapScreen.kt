@@ -222,12 +222,7 @@ fun MapScreen(
                             markers = viewModel.markersState.collectAsState(),
                             radius = appSettings.value.radius,
                             previewRadius = previewRadius.doubleValue,
-                            showPreview = showPreviewState.value,
-                            centreOnLocation = {
-                                scope.launch {
-                                    cameraState.centerOnLocation(it)
-                                }
-                            },
+                            showPreview = showPreviewState.value
                         )
                         if (showPreviewState.value)
                             RadiusSlider(
@@ -243,7 +238,7 @@ fun MapScreen(
 }
 
 private suspend fun CameraPositionState.centerOnLocation(
-    location: LatLng,
+    location: LatLng
 ) = animate(
     update = CameraUpdateFactory.newLatLngZoom(
         location,

@@ -1,5 +1,6 @@
 package com.example.studienarbeit.presentation.map.components
 
+import android.annotation.SuppressLint
 import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -19,11 +20,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.studienarbeit.domain.model.MarkerModel
 import com.example.studienarbeit.presentation.map.states.BootomSheetState
 import com.example.studienarbeit.presentation.map.states.MarkersState
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.Dot
 import com.google.android.gms.maps.model.Gap
 import com.google.android.gms.maps.model.LatLng
@@ -46,7 +50,6 @@ fun MapComponent(
     radius: Double,
     previewRadius: Double,
     showPreview: Boolean,
-    centreOnLocation: (LatLng) -> Unit,
 ) {
 
     var showBottomSheet by remember { mutableStateOf(false) }
@@ -115,8 +118,10 @@ fun MapComponent(
                     GeoPoint(it.latitude, it.longitude),
                     Icons.PREVIEW.name.lowercase()
                 )
-                centreOnLocation(it)
 
+                scope.launch {
+                    cameraState.centreToNewMarker(it)
+                }
             },
             onMapClick = {
                 tempMarker = null
@@ -164,6 +169,15 @@ fun MapComponent(
             }
         }
     }
-
-
 }
+
+suspend fun CameraPositionState.centreToNewMarker(location: LatLng) = animate(
+    CameraUpdateFactory.newCameraPosition(
+        CameraPosition.Builder()
+            .target(LatLng(location.latitude - 0.002, location.longitude))
+            .zoom(16.4f)
+            .bearing(0f)
+            .build()
+    ),
+    500
+)
