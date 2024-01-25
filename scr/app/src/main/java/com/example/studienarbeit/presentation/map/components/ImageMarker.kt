@@ -2,6 +2,7 @@ package com.example.studienarbeit.presentation.map.components
 
 import androidx.compose.runtime.Composable
 import com.example.studienarbeit.domain.model.MarkerModel
+import com.example.studienarbeit.utils.Icons
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.Marker

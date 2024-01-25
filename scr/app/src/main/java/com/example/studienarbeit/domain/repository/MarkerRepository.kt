@@ -14,6 +14,7 @@ interface MarkerRepository {
         title: String,
         latitude: Double,
         longitude: Double,
-        description: String
-    ): Flow<Response<Unit>>
+        description: String,
+        type:String
+    ): Flow<Response<String>>
 }

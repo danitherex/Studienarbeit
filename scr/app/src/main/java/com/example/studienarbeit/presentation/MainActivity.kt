@@ -157,13 +157,17 @@ class MainActivity : ComponentActivity() {
                                 MapScreen(
                                     viewModel = viewModel,
                                     navigateTo = {
-                                        navigator.navigateTo(Navigator.NavTarget.PROFILE)
+                                        navController.navigate(it)
                                     }
                                 )
                             }
                             composable(Navigator.NavTarget.ADD_MARKER.label+"/{latitude}/{longitude}") {
-                                val latitude = it.arguments?.getDouble("latitude") ?:0.0
-                                val longitude = it.arguments?.getDouble("longitude") ?:0.0
+                                val arguments = it.arguments
+                                val _latitude = arguments?.getString("latitude")
+                                val _longitude = arguments?.getString("longitude")
+                                val latitude = _latitude?.toDouble() ?: 0.0
+                                val longitude = _longitude?.toDouble() ?: 0.0
+
                                 val viewModel = hiltViewModel<AddMarkerViewModel>()
                                 AddMarkerScreen(
                                     viewModel = viewModel,

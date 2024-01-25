@@ -5,7 +5,9 @@ import com.example.studienarbeit.domain.model.MarkerModel
 import com.example.studienarbeit.domain.model.Response
 import com.example.studienarbeit.domain.repository.MarkerRepository
 import com.example.studienarbeit.settings.datastore
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.CollectionReference
+import com.google.firebase.firestore.GeoPoint
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
@@ -14,7 +16,8 @@ import javax.inject.Inject
 
 class MarkerRepositoryImpl @Inject constructor(
     private val markerCollection: CollectionReference,
-    private val context: Context
+    private val context: Context,
+    private val auth: FirebaseAuth
 ) : MarkerRepository {
     override fun getMarkers(): Flow<Response<List<MarkerModel>>> = callbackFlow {
         val subscription = markerCollection.addSnapshotListener { snapshot, exception ->
@@ -49,8 +52,23 @@ class MarkerRepositoryImpl @Inject constructor(
         title: String,
         latitude: Double,
         longitude: Double,
-        description: String
-    ): Flow<Response<Unit>> {
-        TODO("Not yet implemented")
+        description: String,
+        type:String
+    ): Flow<Response<String>> {
+        return callbackFlow {
+            val markerModel = MarkerModel(
+                title = title,
+                description = description,
+                userID = auth.currentUser?.uid ?: "",
+                position = GeoPoint(latitude, longitude),
+                type = type
+            )
+            markerCollection.add(markerModel).addOnSuccessListener {
+                trySend(Response.Success("Success")).isSuccess
+            }.addOnFailureListener {
+                trySend(Response.Error(it)).isSuccess
+            }
+            awaitClose { }
+        }
     }
 }

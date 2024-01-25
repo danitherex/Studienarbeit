@@ -1,4 +1,4 @@
-package com.example.studienarbeit.presentation.map.components
+package com.example.studienarbeit.utils
 
 import com.example.studienarbeit.R
 
