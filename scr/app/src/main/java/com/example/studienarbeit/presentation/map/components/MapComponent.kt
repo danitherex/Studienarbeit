@@ -93,6 +93,7 @@ fun MapComponent(
                 )
                 val navString = Navigator.NavTarget.ADD_MARKER.label+"/$lat/$long"
                 navigateTo(navString)
+                tempMarker = null
             },
                 location = tempMarker!!.position
             )

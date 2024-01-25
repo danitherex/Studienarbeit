@@ -8,9 +8,12 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.AbsoluteRoundedCornerShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
@@ -29,6 +32,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewModelScope
 import com.example.studienarbeit.domain.model.MarkerModel
 import com.example.studienarbeit.domain.model.Response
+import com.example.studienarbeit.presentation.addMarker.components.TypeDropDown
 import com.example.studienarbeit.presentation.map.components.ImageMarker
 import com.example.studienarbeit.utils.Icons
 import com.google.android.gms.maps.model.CameraPosition
@@ -55,6 +59,8 @@ fun AddMarkerScreen(
     val scope = viewModel.viewModelScope
 
     val innerPadding = 15.dp
+
+    val scrollState = rememberScrollState()
     val cameraState = rememberCameraPositionState {
         position = CameraPosition.fromLatLngZoom(
             LatLng(latitude, longitude),
@@ -108,6 +114,8 @@ fun AddMarkerScreen(
                 .fillMaxHeight()
                 .clip(RoundedCornerShape(40.dp))
                 .background(color = Color.White)
+                .verticalScroll(scrollState)
+                .imePadding()
         ) {
             Text(
                 text = "Add Marker",
@@ -167,7 +175,7 @@ fun AddMarkerScreen(
                     .padding(start = 20.dp, top = 5.dp, end = 20.dp, bottom = 20.dp),
                 label = { Text(text = "Description") },
                 shape = RoundedCornerShape(10.dp),
-                maxLines = 5
+                maxLines = 5,
             )
 
             Row(
@@ -185,17 +193,14 @@ fun AddMarkerScreen(
                     fontWeight = FontWeight.Bold,
                     color = Color.Black
                 )
-                Button(
-                    onClick = {},
+                TypeDropDown(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(40.dp)
                         .align(Alignment.CenterVertically),
-                    shape = AbsoluteRoundedCornerShape(10.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary)
-                ) {
-                    Text(text = "Add Type")
-                }
+                    type = typeState.value,
+                    onTypeChange = viewModel::setType
+                )
             }
 
             Button(
@@ -227,7 +232,11 @@ fun AddMarkerScreen(
                     .fillMaxWidth()
                     .padding(start = innerPadding, end = innerPadding, bottom = innerPadding)
                     .align(Alignment.End),
-                shape = AbsoluteRoundedCornerShape(10.dp)
+                shape = AbsoluteRoundedCornerShape(10.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = Color.Black
+                )
             ) {
                 Text(text = "Save")
             }

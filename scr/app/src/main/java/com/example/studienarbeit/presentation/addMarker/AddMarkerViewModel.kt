@@ -21,7 +21,7 @@ class AddMarkerViewModel @Inject constructor(
         MutableStateFlow("")
     val descriptionState = _descriptionState.asStateFlow()
     private val _typeState: MutableStateFlow<String> =
-        MutableStateFlow("PIZZA")
+        MutableStateFlow("RESTAURANT")
     val typeState = _typeState.asStateFlow()
 
     fun setTitle(title: String) {
