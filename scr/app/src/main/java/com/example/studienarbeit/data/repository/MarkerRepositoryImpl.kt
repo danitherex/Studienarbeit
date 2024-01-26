@@ -1,6 +1,7 @@
 package com.example.studienarbeit.data.repository
 
 import android.content.Context
+import android.util.Log
 import com.example.studienarbeit.domain.model.MarkerModel
 import com.example.studienarbeit.domain.model.Response
 import com.example.studienarbeit.domain.repository.MarkerRepository
@@ -44,16 +45,24 @@ class MarkerRepositoryImpl @Inject constructor(
         awaitClose { subscription.remove() }
     }
 
-    override fun deleteMarker(markerId: String): Flow<Response<Unit>> {
-        TODO("Not yet implemented")
+    override fun deleteMarker(markerId: String): Flow<Response<Unit>> = callbackFlow {
+        markerCollection.document(markerId).delete().addOnSuccessListener {
+            Log.d("MARKER", "deleteMarker: Success")
+            trySend(Response.Success(Unit)).isSuccess
+        }.addOnFailureListener {
+            Log.d("MARKER", "deleteMarker: Failure: $it")
+            trySend(Response.Error(it)).isSuccess
+        }
+        awaitClose { }
     }
+
 
     override fun addMarker(
         title: String,
         latitude: Double,
         longitude: Double,
         description: String,
-        type:String
+        type: String
     ): Flow<Response<String>> {
         return callbackFlow {
             val markerModel = MarkerModel(

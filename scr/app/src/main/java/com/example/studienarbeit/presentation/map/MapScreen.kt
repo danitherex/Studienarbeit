@@ -224,7 +224,11 @@ fun MapScreen(
                             radius = appSettings.value.radius,
                             previewRadius = previewRadius.doubleValue,
                             showPreview = showPreviewState.value,
-                            navigateTo = navigateTo
+                            navigateTo = navigateTo,
+                            currentUser = viewModel.auth.currentUser?.uid ?: "",
+                            deleteMarker = {
+                                viewModel.onEvent(MarkersEvents.DeleteMarker(it))
+                            }
                         )
                         if (showPreviewState.value)
                             RadiusSlider(

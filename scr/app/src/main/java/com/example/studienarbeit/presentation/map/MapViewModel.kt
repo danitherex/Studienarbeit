@@ -13,6 +13,7 @@ import com.example.studienarbeit.domain.use_case.GetLocation
 import com.example.studienarbeit.domain.use_case.marker.MarkerUseCases
 import com.example.studienarbeit.presentation.map.states.LocationState
 import com.example.studienarbeit.presentation.map.states.MarkersState
+import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -28,6 +29,7 @@ class MapViewModel @Inject constructor(
     private val getLocationUseCase: GetLocation,
     private val markerUseCases: MarkerUseCases,
     val geofencingHelper: GeofencingRepository,
+    val auth: FirebaseAuth
 ) : ViewModel() {
 
 
