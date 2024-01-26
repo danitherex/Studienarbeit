@@ -2,6 +2,8 @@ package com.example.studienarbeit.presentation.addMarker
 
 import android.util.Log
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -17,13 +19,16 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -50,8 +55,11 @@ fun AddMarkerScreen(
     viewModel: AddMarkerViewModel,
     navigateBack: () -> Unit,
     latitude: Double,
-    longitude: Double
+    longitude: Double,
+    modifier: Modifier = Modifier
 ) {
+    val focusManager = LocalFocusManager.current
+
     val titleState = viewModel.titleState.collectAsStateWithLifecycle()
     val descriptionState = viewModel.descriptionState.collectAsStateWithLifecycle()
     val typeState = viewModel.typeState.collectAsStateWithLifecycle()
@@ -68,10 +76,10 @@ fun AddMarkerScreen(
         )
     }
 
+
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(color = Color.White)
     ) {
         GoogleMap(
             cameraPositionState = cameraState,
@@ -110,12 +118,22 @@ fun AddMarkerScreen(
         }
         Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .fillMaxHeight()
-                .clip(RoundedCornerShape(40.dp))
-                .background(color = Color.White)
                 .verticalScroll(scrollState)
                 .imePadding()
+                .clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null
+                ) { focusManager.clearFocus() }
+                .fillMaxSize()
+                .background(
+                    brush = Brush.verticalGradient(
+                        colors = listOf(
+                            MaterialTheme.colorScheme.primary,
+                            MaterialTheme.colorScheme.background,
+                            MaterialTheme.colorScheme.background
+                        )
+                    )
+                )
         ) {
             Text(
                 text = "Add Marker",
@@ -124,7 +142,7 @@ fun AddMarkerScreen(
                     .padding(innerPadding),
                 fontSize = 30.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color.Black
+                color = Color.White,
             )
             Text(
                 text = "Latitude: $latitude\n" +
@@ -134,7 +152,7 @@ fun AddMarkerScreen(
                     .padding(innerPadding),
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color.Black
+                color = Color.White,
             )
             Text(
                 text = "Title",
@@ -143,16 +161,19 @@ fun AddMarkerScreen(
                     .padding(innerPadding),
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color.Black
+                color = Color.White,
             )
-            TextField(
+            OutlinedTextField(
                 value = titleState.value,
                 onValueChange = viewModel::setTitle,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(start = 20.dp, top = 5.dp, end = 20.dp, bottom = 20.dp),
                 label = { Text(text = "Title") },
-                shape = RoundedCornerShape(10.dp)
+                shape = RoundedCornerShape(10.dp),
+                colors = OutlinedTextFieldDefaults.colors(
+                    unfocusedBorderColor = MaterialTheme.colorScheme.onBackground,
+                )
             )
 
             Text(
@@ -162,11 +183,11 @@ fun AddMarkerScreen(
                     .padding(innerPadding),
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color.Black,
+                color = Color.White,
             )
 
 
-            TextField(
+            OutlinedTextField(
                 value = descriptionState.value,
                 onValueChange = viewModel::setDescription,
                 modifier = Modifier
@@ -176,6 +197,9 @@ fun AddMarkerScreen(
                 label = { Text(text = "Description") },
                 shape = RoundedCornerShape(10.dp),
                 maxLines = 5,
+                colors = OutlinedTextFieldDefaults.colors(
+                    unfocusedBorderColor = MaterialTheme.colorScheme.onBackground,
+                )
             )
 
             Row(
@@ -191,7 +215,7 @@ fun AddMarkerScreen(
                         .align(Alignment.CenterVertically),
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.Black
+                    color = Color.White,
                 )
                 TypeDropDown(
                     modifier = Modifier
@@ -205,6 +229,7 @@ fun AddMarkerScreen(
 
             Button(
                 onClick = {
+                    if (titleState.value.isEmpty() || descriptionState.value.isEmpty()) return@Button
                     scope.launch {
                         viewModel.addMarker(
                             title = titleState.value,
@@ -244,7 +269,6 @@ fun AddMarkerScreen(
         }
 
     }
-
 }
 
 @Preview

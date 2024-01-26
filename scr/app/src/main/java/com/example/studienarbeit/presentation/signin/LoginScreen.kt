@@ -111,6 +111,7 @@ fun LoginScreen(
             Spacer(modifier = Modifier.weight(1f, fill = true))
             Spacer(modifier = Modifier.height(48.dp))
             Text(
+                //TODO: fetch text from strings.xml
                 text = "GeoMemo",
                 style = MaterialTheme.typography.displayLarge,
                 color = MaterialTheme.colorScheme.onPrimary,
