@@ -1,5 +1,6 @@
 package com.example.studienarbeit.presentation.map.components
 
+import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -20,11 +21,17 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.studienarbeit.domain.model.MarkerModel
+import com.example.studienarbeit.presentation.Navigator
 import com.example.studienarbeit.presentation.map.states.BootomSheetState
 import com.example.studienarbeit.presentation.map.states.MarkersState
+import com.example.studienarbeit.utils.Icons
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.Dot
 import com.google.android.gms.maps.model.Gap
 import com.google.android.gms.maps.model.LatLng
+import com.google.firebase.firestore.GeoPoint
 import com.google.maps.android.compose.CameraPositionState
 import com.google.maps.android.compose.Circle
 import com.google.maps.android.compose.GoogleMap
@@ -43,10 +50,12 @@ fun MapComponent(
     radius: Double,
     previewRadius: Double,
     showPreview: Boolean,
+    navigateTo : (String) -> Unit
 ) {
 
     var showBottomSheet by remember { mutableStateOf(false) }
     var bottomSheetState by remember { mutableStateOf(BootomSheetState("", "")) }
+    var tempMarker by remember { mutableStateOf<MarkerModel?>(null) }
 
     val sheetState = rememberModalBottomSheetState()
     val scope = rememberCoroutineScope()
@@ -74,6 +83,21 @@ fun MapComponent(
                 }
             }
         }
+        if (tempMarker != null)
+            ConfirmAddDialog(onDismissRequest = { tempMarker = null }, onConfirm = {
+                val lat = tempMarker!!.position.latitude
+                val long = tempMarker!!.position.longitude
+                Log.d(
+                    "Map",
+                    "Add marker at $lat, $long"
+                )
+                val navString = Navigator.NavTarget.ADD_MARKER.label+"/$lat/$long"
+                navigateTo(navString)
+                tempMarker = null
+            },
+                location = tempMarker!!.position
+            )
+
         GoogleMap(
             modifier = Modifier
                 .fillMaxSize(),
@@ -87,7 +111,25 @@ fun MapComponent(
                 myLocationButtonEnabled = false,
                 zoomControlsEnabled = false,
                 compassEnabled = true
-            )
+            ),
+            onMapLongClick = {
+                Log.d("Map", "Long click at ${it.latitude}, ${it.longitude}")
+                tempMarker = MarkerModel(
+                    "",
+                    "",
+                    "",
+                    "",
+                    GeoPoint(it.latitude, it.longitude),
+                    Icons.PREVIEW.name.lowercase()
+                )
+
+                scope.launch {
+                    cameraState.centreToNewMarker(it)
+                }
+            },
+            onMapClick = {
+                tempMarker = null
+            }
         ) {
             when (markers.value) {
                 is MarkersState.Success -> {
@@ -124,6 +166,23 @@ fun MapComponent(
                     strokeWidth = 10.0F,
                     strokePattern = listOf(Dot(), Gap(10.0f)),
                 )
+
+            tempMarker?.let {
+                ImageMarker(marker = it)
+
+            }
         }
     }
 }
+
+
+suspend fun CameraPositionState.centreToNewMarker(location: LatLng) = animate(
+    CameraUpdateFactory.newCameraPosition(
+        CameraPosition.Builder()
+            .target(LatLng(location.latitude - 0.002, location.longitude))
+            .zoom(16.4f)
+            .bearing(0f)
+            .build()
+    ),
+    500
+)

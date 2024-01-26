@@ -10,7 +10,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.example.studienarbeit.R
-import com.example.studienarbeit.presentation.map.components.Icons
+import com.example.studienarbeit.utils.Icons
 import com.example.studienarbeit.settings.datastore
 import com.example.studienarbeit.utils.Constants.GEOFENCE_CHANNEL_ID
 import com.example.studienarbeit.utils.Constants.NOTIFICATION_GROUP_KEY_GEOFENCE

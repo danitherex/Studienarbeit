@@ -1,4 +1,4 @@
-package com.example.studienarbeit.presentation.map.components
+package com.example.studienarbeit.utils
 
 import com.example.studienarbeit.R
 
@@ -9,5 +9,6 @@ enum class Icons (val resourceId:Int ){
     NOODLES(R.drawable.noodels),
     PIZZA(R.drawable.pizza),
     RESTAURANT(R.drawable.restaurant),
-    SALAD(R.drawable.salad)
+    SALAD(R.drawable.salad),
+    PREVIEW(R.drawable.preview)
 }

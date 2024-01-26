@@ -41,6 +41,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.studienarbeit.R
 import com.example.studienarbeit.data.repository.hasLocationPermission
+import com.example.studienarbeit.presentation.Navigator
 import com.example.studienarbeit.presentation.map.components.MapComponent
 import com.example.studienarbeit.presentation.map.states.LocationState
 import com.example.studienarbeit.settings.AppSettings
@@ -57,7 +58,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun MapScreen(
     viewModel: MapViewModel,
-    navigateTo: () -> Unit,
+    navigateTo: (location:String) -> Unit,
 ) {
     val context = LocalContext.current
     val viewState by viewModel.locationState.collectAsStateWithLifecycle()
@@ -177,7 +178,7 @@ fun MapScreen(
                             },
                             actions = {
                                 IconButton(onClick = {
-                                    navigateTo()
+                                    navigateTo(Navigator.NavTarget.PROFILE.label)
                                 }) {
                                     Icon(
                                         imageVector = Icons.Outlined.PersonOutline,
@@ -222,7 +223,8 @@ fun MapScreen(
                             markers = viewModel.markersState.collectAsState(),
                             radius = appSettings.value.radius,
                             previewRadius = previewRadius.doubleValue,
-                            showPreview = showPreviewState.value
+                            showPreview = showPreviewState.value,
+                            navigateTo = navigateTo
                         )
                         if (showPreviewState.value)
                             RadiusSlider(
@@ -238,7 +240,7 @@ fun MapScreen(
 }
 
 private suspend fun CameraPositionState.centerOnLocation(
-    location: LatLng,
+    location: LatLng
 ) = animate(
     update = CameraUpdateFactory.newLatLngZoom(
         location,

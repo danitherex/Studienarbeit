@@ -29,6 +29,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import androidx.navigation.compose.rememberNavController
 import com.example.studienarbeit.domain.repository.GoogleAuthRepository
+import com.example.studienarbeit.presentation.addMarker.AddMarkerScreen
+import com.example.studienarbeit.presentation.addMarker.AddMarkerViewModel
 import com.example.studienarbeit.presentation.map.MapScreen
 import com.example.studienarbeit.presentation.map.MapViewModel
 import com.example.studienarbeit.presentation.permissions.PermissionScreen
@@ -155,10 +157,28 @@ class MainActivity : ComponentActivity() {
                                 MapScreen(
                                     viewModel = viewModel,
                                     navigateTo = {
-                                        navigator.navigateTo(Navigator.NavTarget.PROFILE)
+                                        navController.navigate(it)
                                     }
                                 )
                             }
+                            composable(Navigator.NavTarget.ADD_MARKER.label+"/{latitude}/{longitude}") {
+                                val arguments = it.arguments
+                                val _latitude = arguments?.getString("latitude")
+                                val _longitude = arguments?.getString("longitude")
+                                val latitude = _latitude?.toDouble() ?: 0.0
+                                val longitude = _longitude?.toDouble() ?: 0.0
+
+                                val viewModel = hiltViewModel<AddMarkerViewModel>()
+                                AddMarkerScreen(
+                                    viewModel = viewModel,
+                                    latitude = latitude,
+                                    longitude = longitude,
+                                    navigateBack = {
+                                        navigator.navigateTo(Navigator.NavTarget.MAP)
+                                    }
+                                )
+                            }
+
                             composable(Navigator.NavTarget.PROFILE.label) {
                                 ProfileScreen(
                                     userData = googleAuthUiClient.getSignedUser(),

@@ -40,8 +40,9 @@ object RepositoryModule {
     @Provides
     fun provideMarkerRepository(
         collection: CollectionReference,
-        @ApplicationContext context: Context
-    ): MarkerRepository = MarkerRepositoryImpl(collection,context)
+        @ApplicationContext context: Context,
+        auth:FirebaseAuth
+    ): MarkerRepository = MarkerRepositoryImpl(collection,context,auth)
 
     @Singleton
     @Provides

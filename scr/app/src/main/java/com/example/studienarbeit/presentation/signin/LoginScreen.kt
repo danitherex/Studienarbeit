@@ -46,12 +46,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
@@ -111,6 +113,7 @@ fun LoginScreen(
             Spacer(modifier = Modifier.weight(1f, fill = true))
             Spacer(modifier = Modifier.height(48.dp))
             Text(
+                //TODO: fetch text from strings.xml
                 text = "GeoMemo",
                 style = MaterialTheme.typography.displayLarge,
                 color = MaterialTheme.colorScheme.onPrimary,
@@ -153,10 +156,14 @@ fun LoginScreen(
                     .padding(8.dp),
                 singleLine = true,
                 keyboardOptions = KeyboardOptions.Default.copy(
-                    keyboardType = KeyboardType.Text
+                    keyboardType = KeyboardType.Text,
+                    imeAction = ImeAction.Next
                 ),
                 colors = OutlinedTextFieldDefaults.colors(
                     unfocusedBorderColor = MaterialTheme.colorScheme.onBackground,
+                ),
+                keyboardActions = KeyboardActions(
+                    onNext = { focusManager.moveFocus(FocusDirection.Next) }
                 ),
             )
 
