@@ -45,10 +45,10 @@ class MarkerRepositoryImpl @Inject constructor(
         awaitClose { subscription.remove() }
     }
 
-    override fun deleteMarker(markerId: String): Flow<Response<Unit>> = callbackFlow {
+    override fun deleteMarker(markerId: String): Flow<Response<String>> = callbackFlow {
         markerCollection.document(markerId).delete().addOnSuccessListener {
             Log.d("MARKER", "deleteMarker: Success")
-            trySend(Response.Success(Unit)).isSuccess
+            trySend(Response.Success("Success")).isSuccess
         }.addOnFailureListener {
             Log.d("MARKER", "deleteMarker: Failure: $it")
             trySend(Response.Error(it)).isSuccess

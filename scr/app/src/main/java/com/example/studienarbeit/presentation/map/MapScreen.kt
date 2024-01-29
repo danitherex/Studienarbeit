@@ -227,7 +227,7 @@ fun MapScreen(
                             navigateTo = navigateTo,
                             currentUser = viewModel.auth.currentUser?.uid ?: "",
                             deleteMarker = {
-                                viewModel.onEvent(MarkersEvents.DeleteMarker(it))
+                                viewModel.deleteMarker(it)
                             }
                         )
                         if (showPreviewState.value)
@@ -250,5 +250,5 @@ private suspend fun CameraPositionState.centerOnLocation(
         location,
         16.3f
     ),
-    durationMs = 1500
+    durationMs = 1000
 )

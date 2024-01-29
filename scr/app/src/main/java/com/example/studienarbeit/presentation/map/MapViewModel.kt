@@ -16,6 +16,7 @@ import com.example.studienarbeit.presentation.map.states.MarkersState
 import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
@@ -43,7 +44,7 @@ class MapViewModel @Inject constructor(
     val showPreviewState = _showPreviewState.asStateFlow()
 
     //TODO: set radius as default value
-    val previewRadius:MutableDoubleState = mutableDoubleStateOf(250.0)
+    val previewRadius: MutableDoubleState = mutableDoubleStateOf(250.0)
 
     private var getNotesJob: Job? = null
 
@@ -57,14 +58,8 @@ class MapViewModel @Inject constructor(
         getNotes()
     }
 
-    fun onEvent(event: MarkersEvents) {
-        when (event) {
-            is MarkersEvents.DeleteMarker -> {
-                viewModelScope.launch {
-                    markerUseCases.deleteMarker(event.id)
-                }
-            }
-        }
+    fun deleteMarker(markerId: String): Flow<Response<String>> {
+        return markerUseCases.deleteMarker(markerId)
     }
 
     fun handle(event: PermissionEvent) {
