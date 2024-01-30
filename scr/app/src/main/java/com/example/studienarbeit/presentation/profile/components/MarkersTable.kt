@@ -168,7 +168,8 @@ fun SearchBar(onSearch: (String) -> Unit) {
         },
         label = { Text("Search") },
         modifier = Modifier
-            .fillMaxWidth()
+            .fillMaxWidth(),
+        singleLine = true
     )
 }
 
