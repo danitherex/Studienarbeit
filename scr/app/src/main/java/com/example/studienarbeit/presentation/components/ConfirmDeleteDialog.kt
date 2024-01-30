@@ -1,4 +1,4 @@
-package com.example.studienarbeit.presentation.map.components
+package com.example.studienarbeit.presentation.components
 
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Text

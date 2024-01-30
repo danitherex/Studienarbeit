@@ -26,6 +26,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.studienarbeit.domain.model.MarkerModel
+import com.example.studienarbeit.presentation.components.ConfirmDeleteDialog
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

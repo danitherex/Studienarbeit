@@ -36,6 +36,7 @@ import com.example.studienarbeit.presentation.map.MapViewModel
 import com.example.studienarbeit.presentation.permissions.PermissionScreen
 import com.example.studienarbeit.presentation.permissions.PermissionViewModel
 import com.example.studienarbeit.presentation.profile.ProfileScreen
+import com.example.studienarbeit.presentation.profile.ProfileViewModel
 import com.example.studienarbeit.presentation.signin.SignInScreen
 import com.example.studienarbeit.presentation.signin.SignInViewModel
 import com.example.studienarbeit.ui.theme.StudienarbeitTheme
@@ -181,7 +182,10 @@ class MainActivity : ComponentActivity() {
                             }
 
                             composable(Navigator.NavTarget.PROFILE.label) {
+                                val viewModel = hiltViewModel<ProfileViewModel>()
+
                                 ProfileScreen(
+                                    viewModel = viewModel,
                                     userData = googleAuthUiClient.getSignedUser(),
                                     onSignOut = {
                                         lifecycleScope.launch {

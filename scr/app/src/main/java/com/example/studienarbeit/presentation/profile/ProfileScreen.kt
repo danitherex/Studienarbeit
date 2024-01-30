@@ -30,7 +30,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
+import com.example.studienarbeit.presentation.profile.components.MarkersTable
 import com.example.studienarbeit.presentation.signin.UserData
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -38,15 +40,19 @@ import com.example.studienarbeit.presentation.signin.UserData
 fun ProfileScreen(
     userData: UserData?,
     onSignOut: () -> Unit,
-    navigateBack:()->Unit
+    navigateBack: () -> Unit,
+    viewModel: ProfileViewModel
 ) {
+
+    val items = viewModel.items.collectAsStateWithLifecycle()
+
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         topBar = {
             TopAppBar(
                 title = {},
                 navigationIcon = {
-                    IconButton(onClick = {navigateBack() }) {
+                    IconButton(onClick = { navigateBack() }) {
                         Icon(
                             imageVector = Icons.Filled.ArrowBack,
                             contentDescription = "Back"
@@ -57,13 +63,11 @@ fun ProfileScreen(
             )
         }
     ) { innerPadding ->
-
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center,
         ) {
             if (userData?.profilePictureUrl != null) {
                 AsyncImage(
@@ -97,6 +101,12 @@ fun ProfileScreen(
             Button(onClick = onSignOut) {
                 Text(text = "Sign out")
             }
+            MarkersTable(
+                items = items.value,
+                search = viewModel::searchMarkers,
+                userID = viewModel.auth?.currentUser?.uid ?: "",
+                deleteMarker = viewModel::deleteMarker
+            )
         }
     }
 }
@@ -105,5 +115,10 @@ fun ProfileScreen(
 @Composable
 fun PreviewProfileScreen() {
     val userdata = UserData("id", "username", null)
-    ProfileScreen(userData = userdata, onSignOut = {}, navigateBack = {})
+    ProfileScreen(userData = userdata, onSignOut = {}, navigateBack = {},
+        viewModel = ProfileViewModel(
+            useCases = null,
+            auth = null
+        )
+    )
 }
