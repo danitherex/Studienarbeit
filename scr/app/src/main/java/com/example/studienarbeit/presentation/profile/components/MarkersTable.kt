@@ -1,6 +1,7 @@
 package com.example.studienarbeit.presentation.profile.components
 
 import android.util.Log
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -34,9 +35,9 @@ import androidx.compose.ui.unit.sp
 import com.example.studienarbeit.domain.model.MarkerModel
 import com.example.studienarbeit.domain.model.Response
 import com.example.studienarbeit.presentation.components.ConfirmDeleteDialog
+import com.example.studienarbeit.ui.theme.StudienarbeitTheme
 import com.google.firebase.firestore.GeoPoint
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 
@@ -49,7 +50,7 @@ fun MarkersTable(
     deleteMarker: (String) -> Flow<Response<String>>
 ) {
 
-    Column {
+    Column (modifier.background(MaterialTheme.colorScheme.background)) {
         SearchBar(onSearch = { query -> search(query) })
         Spacer(modifier = Modifier.height(16.dp))
         ItemList(items = items, userID = userID, deleteMarker = deleteMarker)
@@ -65,13 +66,13 @@ fun ItemList(
 ) {
     val scope = rememberCoroutineScope()
     var showDeleteDialog by remember { mutableStateOf(false) }
-    var deleteMarker by remember { mutableStateOf(MarkerModel()) }
+    var markerToBeDeleted by remember { mutableStateOf(MarkerModel()) }
 
     if (showDeleteDialog)
         ConfirmDeleteDialog(
             onConfirm = {
                 scope.launch {
-                    deleteMarker(deleteMarker.id).collect {
+                    deleteMarker(markerToBeDeleted.id).collect {
                         if (it is Response.Success) {
                             Log.d("Map", "Successfully deleted marker")
                             showDeleteDialog = false
@@ -82,7 +83,7 @@ fun ItemList(
 
                 }
             },
-            title = deleteMarker.title,
+            title = markerToBeDeleted.title,
             onDismissRequest = { showDeleteDialog = false }
         )
 
@@ -139,7 +140,7 @@ fun ItemList(
                         )
                         IconButton(
                             onClick = {
-                                deleteMarker = items[index]
+                                markerToBeDeleted = items[index]
                                 showDeleteDialog = true
                             },
                             modifier = Modifier
@@ -173,38 +174,41 @@ fun SearchBar(onSearch: (String) -> Unit) {
     )
 }
 
-@Preview
+@Preview(showBackground = true)
 @Composable
 fun MarkersColumnPreview() {
     fun mockDeleteMarker(markerID: String) = flow {
         emit(Response.Success("Marker $markerID deleted successfully"))
     }
-    MarkersTable(
-        items = listOf(
-            MarkerModel(
-                position = GeoPoint(0.0, 0.0),
-                title = "Test",
-                description = "Test",
-                type = "PIZZA",
-                userID = "Test"
+    StudienarbeitTheme(darkTheme = true) {
+
+        MarkersTable(
+            items = listOf(
+                MarkerModel(
+                    position = GeoPoint(0.0, 0.0),
+                    title = "Test",
+                    description = "Test",
+                    type = "PIZZA",
+                    userID = "Test"
+                ),
+                MarkerModel(
+                    position = GeoPoint(0.0, 0.0),
+                    title = "Test2",
+                    description = "Test2",
+                    type = "PIZZA",
+                    userID = "Test"
+                ),
+                MarkerModel(
+                    position = GeoPoint(0.0, 0.0),
+                    title = "Test3",
+                    description = "Test3",
+                    type = "KEBAB",
+                    userID = "Test"
+                ),
             ),
-            MarkerModel(
-                position = GeoPoint(0.0, 0.0),
-                title = "Test2",
-                description = "Test2",
-                type = "PIZZA",
-                userID = "Test"
-            ),
-            MarkerModel(
-                position = GeoPoint(0.0, 0.0),
-                title = "Test3",
-                description = "Test3",
-                type = "KEBAB",
-                userID = "Test"
-            ),
-        ),
-        search = {},
-        userID = "Test",
-        deleteMarker = { mockDeleteMarker(it) }
-    )
+            search = {},
+            userID = "Test",
+            deleteMarker = { mockDeleteMarker(it) }
+        )
+    }
 }
