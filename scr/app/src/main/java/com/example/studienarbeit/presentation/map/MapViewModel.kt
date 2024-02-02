@@ -7,12 +7,17 @@ import androidx.compose.runtime.MutableDoubleState
 import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
 import com.example.studienarbeit.domain.model.Response
 import com.example.studienarbeit.domain.repository.GeofencingRepository
 import com.example.studienarbeit.domain.use_case.GetLocation
 import com.example.studienarbeit.domain.use_case.marker.MarkerUseCases
 import com.example.studienarbeit.presentation.map.states.LocationState
 import com.example.studienarbeit.presentation.map.states.MarkersState
+import com.example.studienarbeit.services.GeofenceUpdateWorker
+import com.example.studienarbeit.utils.Constants
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,6 +25,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 @RequiresApi(Build.VERSION_CODES.S)
@@ -28,6 +34,7 @@ class MapViewModel @Inject constructor(
     private val getLocationUseCase: GetLocation,
     private val markerUseCases: MarkerUseCases,
     val geofencingHelper: GeofencingRepository,
+    private val workManager: WorkManager
 ) : ViewModel() {
 
 
@@ -41,7 +48,7 @@ class MapViewModel @Inject constructor(
     val showPreviewState = _showPreviewState.asStateFlow()
 
     //TODO: set radius as default value
-    val previewRadius:MutableDoubleState = mutableDoubleStateOf(250.0)
+    val previewRadius: MutableDoubleState = mutableDoubleStateOf(250.0)
 
     private var getNotesJob: Job? = null
 
@@ -68,6 +75,7 @@ class MapViewModel @Inject constructor(
     fun handle(event: PermissionEvent) {
         when (event) {
             PermissionEvent.Granted -> {
+                scheduleGeofenceUpdates()
                 viewModelScope.launch {
                     getLocationUseCase.invoke().collect { location ->
                         _locationState.value = LocationState.Success(location)
@@ -104,6 +112,20 @@ class MapViewModel @Inject constructor(
             }
             .launchIn(viewModelScope)
     }
+
+    private fun scheduleGeofenceUpdates() {
+        val periodicWorkRequest = PeriodicWorkRequestBuilder<GeofenceUpdateWorker>(
+            12, TimeUnit.HOURS,
+            1, TimeUnit.HOURS
+        ).build()
+
+        workManager.enqueueUniquePeriodicWork(
+            Constants.GEOFENCE_WORKER_TAG,
+            ExistingPeriodicWorkPolicy.KEEP,
+            periodicWorkRequest
+        )
+    }
+
 }
 
 
