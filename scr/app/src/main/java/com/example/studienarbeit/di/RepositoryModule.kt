@@ -11,6 +11,7 @@ import com.example.studienarbeit.domain.repository.GeofencingRepository
 import com.example.studienarbeit.domain.repository.GoogleAuthRepository
 import com.example.studienarbeit.domain.repository.LocationRepository
 import com.example.studienarbeit.domain.repository.MarkerRepository
+import com.example.studienarbeit.domain.use_case.GetLocation
 import com.google.android.gms.auth.api.identity.Identity
 import com.google.android.gms.location.GeofencingClient
 import com.google.android.gms.location.LocationServices
@@ -67,10 +68,12 @@ object RepositoryModule {
     @Provides
     fun provideGeoFencingRepository(
         @ApplicationContext context:Context,
-        geofencingClient : GeofencingClient
+        geofencingClient : GeofencingClient,
+        getLocation:GetLocation
     ): GeofencingRepository = GeofencingRepositoryImpl(
         context,
-        geofencingClient
+        geofencingClient,
+        getLocation
     )
 
 
