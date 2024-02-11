@@ -1,7 +1,7 @@
 package com.example.studienarbeit.presentation.profile
 
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,9 +12,11 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -27,6 +29,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -34,6 +37,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.example.studienarbeit.presentation.profile.components.MarkersTable
 import com.example.studienarbeit.presentation.signin.UserData
+import com.example.studienarbeit.ui.theme.StudienarbeitTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -47,7 +51,8 @@ fun ProfileScreen(
     val items = viewModel.items.collectAsStateWithLifecycle()
 
     Scaffold(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier
+            .fillMaxSize(),
         topBar = {
             TopAppBar(
                 title = {},
@@ -66,9 +71,11 @@ fun ProfileScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(innerPadding),
+                .padding(innerPadding)
+                .background(MaterialTheme.colorScheme.background),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
+            Spacer(modifier = Modifier.height(16.dp))
             if (userData?.profilePictureUrl != null) {
                 AsyncImage(
                     model = userData.profilePictureUrl,
@@ -98,10 +105,20 @@ fun ProfileScreen(
                 )
                 Spacer(modifier = Modifier.height(16.dp))
             }
-            Button(onClick = onSignOut) {
+            Button(
+                onClick = onSignOut,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary
+                )
+            ) {
                 Text(text = "Sign out")
             }
+            Spacer(modifier = Modifier.height(32.dp))
             MarkersTable(
+                modifier = Modifier
+                    .padding(8.dp)
+                    .weight(1f),
                 items = items.value,
                 search = viewModel::searchMarkers,
                 userID = viewModel.auth?.currentUser?.uid ?: "",
@@ -111,14 +128,42 @@ fun ProfileScreen(
     }
 }
 
-@Preview
 @Composable
+@Preview(
+    showBackground = true,
+    device = Devices.PIXEL_4_XL,
+    showSystemUi = false,
+    name = "Light Mode",
+    group = "SignInScreen"
+)
 fun PreviewProfileScreen() {
-    val userdata = UserData("id", "username", null)
-    ProfileScreen(userData = userdata, onSignOut = {}, navigateBack = {},
-        viewModel = ProfileViewModel(
-            useCases = null,
-            auth = null
+    StudienarbeitTheme(darkTheme = false, dynamicColor = false) {
+        val userdata = UserData("id", "username", null)
+        ProfileScreen(userData = userdata, onSignOut = {}, navigateBack = {},
+            viewModel = ProfileViewModel(
+                useCases = null,
+                auth = null
+            )
         )
-    )
+    }
+}
+
+@Composable
+@Preview(
+    showBackground = true,
+    device = Devices.PIXEL_4_XL,
+    showSystemUi = false,
+    name = "Dark Mode",
+    group = "SignInScreen"
+)
+fun PreviewProfileScreen2() {
+    StudienarbeitTheme(darkTheme = true, dynamicColor = false) {
+        val userdata = UserData("id", "username", null)
+        ProfileScreen(userData = userdata, onSignOut = {}, navigateBack = {},
+            viewModel = ProfileViewModel(
+                useCases = null,
+                auth = null
+            )
+        )
+    }
 }

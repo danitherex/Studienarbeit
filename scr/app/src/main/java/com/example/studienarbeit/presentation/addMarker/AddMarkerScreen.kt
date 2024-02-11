@@ -27,10 +27,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -44,6 +42,7 @@ import com.example.studienarbeit.domain.model.MarkerModel
 import com.example.studienarbeit.domain.model.Response
 import com.example.studienarbeit.presentation.addMarker.components.TypeDropDown
 import com.example.studienarbeit.presentation.map.components.ImageMarker
+import com.example.studienarbeit.ui.theme.StudienarbeitTheme
 import com.example.studienarbeit.utils.Icons
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
@@ -83,7 +82,7 @@ fun AddMarkerScreen(
 
 
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
     ) {
         GoogleMap(
@@ -130,7 +129,7 @@ fun AddMarkerScreen(
                     indication = null
                 ) { focusManager.clearFocus() }
                 .fillMaxSize()
-                .background(Color.Black)
+                .background(MaterialTheme.colorScheme.background)
         ) {
             Text(
                 text = "Add Marker",
@@ -139,7 +138,7 @@ fun AddMarkerScreen(
                     .padding(innerPadding),
                 fontSize = 30.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color.White,
+                color = MaterialTheme.colorScheme.onBackground,
             )
             Text(
                 text = "Latitude: $latitude\n" +
@@ -149,7 +148,7 @@ fun AddMarkerScreen(
                     .padding(innerPadding),
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color.White,
+                color = MaterialTheme.colorScheme.onBackground,
             )
             Text(
                 text = "Title",
@@ -158,7 +157,7 @@ fun AddMarkerScreen(
                     .padding(innerPadding),
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color.White,
+                color = MaterialTheme.colorScheme.onBackground,
             )
             OutlinedTextField(
                 value = titleState.value,
@@ -189,7 +188,7 @@ fun AddMarkerScreen(
                     .padding(innerPadding),
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color.White,
+                color = MaterialTheme.colorScheme.onBackground,
             )
 
 
@@ -228,7 +227,7 @@ fun AddMarkerScreen(
                         .align(Alignment.CenterVertically),
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.White,
+                    color = MaterialTheme.colorScheme.onBackground,
                 )
                 TypeDropDown(
                     modifier = Modifier
@@ -273,7 +272,7 @@ fun AddMarkerScreen(
                 shape = AbsoluteRoundedCornerShape(10.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = MaterialTheme.colorScheme.primary,
-                    contentColor = Color.Black
+                    contentColor = MaterialTheme.colorScheme.onPrimary
                 )
             ) {
                 Text(text = "Save")
@@ -287,10 +286,12 @@ fun AddMarkerScreen(
 @Preview
 @Composable
 fun AddMarkerScreenPreview() {
-    AddMarkerScreen(
-        viewModel = AddMarkerViewModel(null),
-        navigateBack = {},
-        latitude = 0.0,
-        longitude = 0.0
-    )
+    StudienarbeitTheme(darkTheme = true) {
+        AddMarkerScreen(
+            viewModel = AddMarkerViewModel(null),
+            navigateBack = {},
+            latitude = 0.0,
+            longitude = 0.0
+        )
+    }
 }

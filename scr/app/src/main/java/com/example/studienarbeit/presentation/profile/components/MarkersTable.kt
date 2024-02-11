@@ -101,14 +101,14 @@ fun ItemList(
                         .padding(end = 8.dp),
                     fontWeight = FontWeight.Bold,
                     fontSize = 18.sp,
-                    color = MaterialTheme.colorScheme.primary
+                    color = MaterialTheme.colorScheme.onBackground
                 )
                 Text(
                     "Type",
                     modifier = Modifier.weight(1f),
                     fontWeight = FontWeight.Bold,
                     fontSize = 18.sp,
-                    color = MaterialTheme.colorScheme.primary
+                    color = MaterialTheme.colorScheme.onBackground
                 )
             }
             Divider(thickness = 1.dp, color = Color.Gray)

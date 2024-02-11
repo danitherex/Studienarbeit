@@ -23,10 +23,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.studienarbeit.ui.theme.StudienarbeitTheme
 import com.example.studienarbeit.utils.Icons
 
 @Composable
@@ -49,7 +49,7 @@ fun TypeDropDown(
                 .clip(shape = RoundedCornerShape(6.dp)),
             colors = ButtonDefaults.buttonColors(
                 containerColor = MaterialTheme.colorScheme.secondary,
-                contentColor = Color.Black
+                contentColor = MaterialTheme.colorScheme.onSecondary
             )
         ) {
             Row {
@@ -108,8 +108,10 @@ fun String.toTitleCase(): String {
 @Preview
 @Composable
 fun TypeDropDownPreview() {
-    TypeDropDown(
-        type = Icons.BURGER.name,
-        onTypeChange = {}
-    )
+    StudienarbeitTheme {
+        TypeDropDown(
+            type = Icons.BURGER.name,
+            onTypeChange = {}
+        )
+    }
 }

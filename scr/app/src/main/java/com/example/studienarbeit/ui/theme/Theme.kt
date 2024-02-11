@@ -14,18 +14,20 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
-import androidx.core.graphics.toColorInt
 import androidx.core.view.ViewCompat
 
 private val DarkColorScheme = darkColorScheme(
     primary = Purple80,
-    onPrimary = Color("#3e384c".toColorInt()),
+    onPrimary = Purple20,
     secondary = PurpleGrey80,
+    onSecondary = Color.Black,
     tertiary = Pink80,
     background = Color.Black,
     onBackground = Color.White,
     surface = Color.Black,
     onSurface = Color.Black,
+    primaryContainer = Purple80,
+    onPrimaryContainer = Purple20,
 
 )
 
@@ -33,16 +35,17 @@ private val LightColorScheme = lightColorScheme(
     primary = Purple40,
     onPrimary = Color.White,
     secondary = PurpleGrey40,
+    onSecondary = Color.White,
     tertiary = Pink40,
     background = Color.White,
     onBackground = Color.Black,
     surface = Color.White,
     onSurface = Color.Black,
+    primaryContainer = Purple40,
+    onPrimaryContainer = Color.White,
 
     /* Other default colors to override
 
-    primaryContainer
-    onPrimaryContainer
     inversePrimary
     onSecondary
     secondaryContainer
