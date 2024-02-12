@@ -49,6 +49,9 @@ fun ProfileScreen(
 ) {
 
     val items = viewModel.items.collectAsStateWithLifecycle()
+    val isFocused = viewModel.isFocused.collectAsStateWithLifecycle()
+
+
 
     Scaffold(
         modifier = Modifier
@@ -76,45 +79,47 @@ fun ProfileScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Spacer(modifier = Modifier.height(16.dp))
-            if (userData?.profilePictureUrl != null) {
-                AsyncImage(
-                    model = userData.profilePictureUrl,
-                    contentDescription = "Profile Picture",
-                    modifier = Modifier
-                        .size(150.dp)
-                        .clip(CircleShape),
-                    contentScale = ContentScale.Crop
-                )
-            } else {
-                Canvas(
-                    modifier = Modifier
-                        .size(150.dp),
-                    onDraw = {
-                        drawCircle(color = Color.Gray)
-                    }
-                )
-            }
-            Spacer(modifier = Modifier.height(16.dp))
-
-            if (userData?.username != null) {
-                Text(
-                    text = userData.username,
-                    textAlign = TextAlign.Center,
-                    fontSize = 36.sp,
-                    fontWeight = FontWeight.SemiBold
-                )
+            if(isFocused.value) {
+                if (userData?.profilePictureUrl != null) {
+                    AsyncImage(
+                        model = userData.profilePictureUrl,
+                        contentDescription = "Profile Picture",
+                        modifier = Modifier
+                            .size(150.dp)
+                            .clip(CircleShape),
+                        contentScale = ContentScale.Crop
+                    )
+                } else {
+                    Canvas(
+                        modifier = Modifier
+                            .size(150.dp),
+                        onDraw = {
+                            drawCircle(color = Color.Gray)
+                        }
+                    )
+                }
                 Spacer(modifier = Modifier.height(16.dp))
+
+                if (userData?.username != null) {
+                    Text(
+                        text = userData.username,
+                        textAlign = TextAlign.Center,
+                        fontSize = 36.sp,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                }
+                Button(
+                    onClick = onSignOut,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.onPrimary
+                    )
+                ) {
+                    Text(text = "Sign out")
+                }
+                Spacer(modifier = Modifier.height(32.dp))
             }
-            Button(
-                onClick = onSignOut,
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    contentColor = MaterialTheme.colorScheme.onPrimary
-                )
-            ) {
-                Text(text = "Sign out")
-            }
-            Spacer(modifier = Modifier.height(32.dp))
             MarkersTable(
                 modifier = Modifier
                     .padding(8.dp)
@@ -122,7 +127,8 @@ fun ProfileScreen(
                 items = items.value,
                 search = viewModel::searchMarkers,
                 userID = viewModel.auth?.currentUser?.uid ?: "",
-                deleteMarker = viewModel::deleteMarker
+                deleteMarker = viewModel::deleteMarker,
+                toggleFocus = viewModel::setFocus,
             )
         }
     }

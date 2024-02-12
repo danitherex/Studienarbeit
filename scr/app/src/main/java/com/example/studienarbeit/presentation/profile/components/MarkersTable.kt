@@ -1,6 +1,7 @@
 package com.example.studienarbeit.presentation.profile.components
 
 import android.util.Log
+import android.view.ViewTreeObserver
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -11,6 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Card
 import androidx.compose.material3.Divider
@@ -20,6 +22,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -27,8 +30,12 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -47,11 +54,12 @@ fun MarkersTable(
     items: List<MarkerModel>,
     search: (String) -> Unit,
     userID: String,
-    deleteMarker: (String) -> Flow<Response<String>>
+    deleteMarker: (String) -> Flow<Response<String>>,
+    toggleFocus: (focus: Boolean) -> Unit
 ) {
 
-    Column (modifier.background(MaterialTheme.colorScheme.background)) {
-        SearchBar(onSearch = { query -> search(query) })
+    Column(modifier.background(MaterialTheme.colorScheme.background)) {
+        SearchBar(onSearch = { query -> search(query) }, toggleFocus = toggleFocus)
         Spacer(modifier = Modifier.height(16.dp))
         ItemList(items = items, userID = userID, deleteMarker = deleteMarker)
     }
@@ -159,8 +167,12 @@ fun ItemList(
 }
 
 @Composable
-fun SearchBar(onSearch: (String) -> Unit) {
+fun SearchBar(onSearch: (String) -> Unit, toggleFocus: (focus: Boolean) -> Unit) {
     var text by remember { mutableStateOf("") }
+    ObserveKeyboardState { isVisible ->
+        toggleFocus(!isVisible)
+    }
+
     TextField(
         value = text,
         onValueChange = {
@@ -170,12 +182,61 @@ fun SearchBar(onSearch: (String) -> Unit) {
         label = { Text("Search") },
         modifier = Modifier
             .fillMaxWidth(),
-        singleLine = true
+        singleLine = true,
+        trailingIcon = {
+            if (!text.isNotEmpty()) {
+                IconButton(
+                    onClick = {
+                        text = ""
+                        onSearch(text)
+                    },
+                    modifier = Modifier
+                        .padding(8.dp)
+                ) {
+                    Icon(
+                        Icons.Default.Close,
+                        contentDescription = "Clear search",
+                        tint = Color.Gray
+                    )
+                }
+            }
+        }
     )
 }
 
-@Preview(showBackground = true)
 @Composable
+fun ObserveKeyboardState(onKeyboardVisibilityChanged: (Boolean) -> Unit) {
+    val view = LocalView.current
+    val density = LocalDensity.current
+
+    DisposableEffect(view) {
+        val listener = ViewTreeObserver.OnGlobalLayoutListener {
+            val rect = android.graphics.Rect()
+            view.getWindowVisibleDisplayFrame(rect)
+
+            val screenHeight = view.rootView.height
+            val keypadHeight = screenHeight - rect.bottom
+
+            onKeyboardVisibilityChanged(keypadHeight > screenHeight * 0.15)
+        }
+
+        view.viewTreeObserver.addOnGlobalLayoutListener(listener)
+
+        onDispose {
+            view.viewTreeObserver.removeOnGlobalLayoutListener(listener)
+        }
+    }
+}
+
+
+@Composable
+@Preview(
+    showBackground = true,
+    device = Devices.PIXEL_4_XL,
+    showSystemUi = false,
+    name = "Light Mode",
+    group = "SignInScreen"
+)
 fun MarkersColumnPreview() {
     fun mockDeleteMarker(markerID: String) = flow {
         emit(Response.Success("Marker $markerID deleted successfully"))
@@ -208,7 +269,55 @@ fun MarkersColumnPreview() {
             ),
             search = {},
             userID = "Test",
-            deleteMarker = { mockDeleteMarker(it) }
+            deleteMarker = { mockDeleteMarker(it) },
+            toggleFocus = {}
         )
     }
 }
+
+@Composable
+@Preview(
+    showBackground = true,
+    device = Devices.PIXEL_4_XL,
+    showSystemUi = false,
+    name = "Dark Mode",
+    group = "SignInScreen"
+)
+fun MarkersColumnPreview2() {
+    fun mockDeleteMarker(markerID: String) = flow {
+        emit(Response.Success("Marker $markerID deleted successfully"))
+    }
+    StudienarbeitTheme(darkTheme = true) {
+
+        MarkersTable(
+            items = listOf(
+                MarkerModel(
+                    position = GeoPoint(0.0, 0.0),
+                    title = "Test",
+                    description = "Test",
+                    type = "PIZZA",
+                    userID = "Test"
+                ),
+                MarkerModel(
+                    position = GeoPoint(0.0, 0.0),
+                    title = "Test2",
+                    description = "Test2",
+                    type = "PIZZA",
+                    userID = "Test"
+                ),
+                MarkerModel(
+                    position = GeoPoint(0.0, 0.0),
+                    title = "Test3",
+                    description = "Test3",
+                    type = "KEBAB",
+                    userID = "Test"
+                ),
+            ),
+            search = {},
+            userID = "Test",
+            deleteMarker = { mockDeleteMarker(it) },
+            toggleFocus = {}
+        )
+    }
+}
+

@@ -26,12 +26,18 @@ class ProfileViewModel @Inject constructor(
     private var _items: MutableStateFlow<List<MarkerModel>> =
         MutableStateFlow(listOf())
     val items = _items.asStateFlow()
+    private var _isFocused: MutableStateFlow<Boolean> = MutableStateFlow(true)
+    val isFocused = _isFocused.asStateFlow()
     private var originalMarkers = mutableListOf<MarkerModel>()
     private var getNotesJob: Job? = null
     private var searchQuery = ""
 
     init {
         getNotes()
+    }
+
+    fun setFocus(focus: Boolean) {
+        _isFocused.value = focus
     }
 
     fun searchMarkers(query: String) {
