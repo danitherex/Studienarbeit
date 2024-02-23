@@ -22,6 +22,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -38,6 +39,7 @@ import coil.compose.AsyncImage
 import com.example.studienarbeit.presentation.profile.components.MarkersTable
 import com.example.studienarbeit.presentation.signin.UserData
 import com.example.studienarbeit.ui.theme.StudienarbeitTheme
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -50,6 +52,8 @@ fun ProfileScreen(
 
     val items = viewModel.items.collectAsStateWithLifecycle()
     val isFocused = viewModel.isFocused.collectAsStateWithLifecycle()
+
+    val scope = rememberCoroutineScope()
 
 
 
@@ -118,8 +122,23 @@ fun ProfileScreen(
                 ) {
                     Text(text = "Sign out")
                 }
+                Button(
+                    onClick={
+                        scope.launch {
+                            viewModel.geofencingHelper?.removeAllGeofences()
+                        }
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.secondary,
+                        contentColor = MaterialTheme.colorScheme.onSecondary
+                    )
+                ) {
+                    Text(text = "Stop tracking")
+                }
                 Spacer(modifier = Modifier.height(32.dp))
             }
+
+
             MarkersTable(
                 modifier = Modifier
                     .padding(8.dp)
@@ -129,6 +148,7 @@ fun ProfileScreen(
                 userID = viewModel.auth?.currentUser?.uid ?: "",
                 deleteMarker = viewModel::deleteMarker,
                 toggleFocus = viewModel::setFocus,
+                isFocused = isFocused.value
             )
         }
     }
@@ -148,7 +168,8 @@ fun PreviewProfileScreen() {
         ProfileScreen(userData = userdata, onSignOut = {}, navigateBack = {},
             viewModel = ProfileViewModel(
                 useCases = null,
-                auth = null
+                auth = null,
+                geofencingHelper = null
             )
         )
     }
@@ -168,7 +189,8 @@ fun PreviewProfileScreen2() {
         ProfileScreen(userData = userdata, onSignOut = {}, navigateBack = {},
             viewModel = ProfileViewModel(
                 useCases = null,
-                auth = null
+                auth = null,
+                geofencingHelper = null
             )
         )
     }

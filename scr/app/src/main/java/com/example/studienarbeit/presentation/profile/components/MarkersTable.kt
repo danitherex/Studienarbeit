@@ -6,6 +6,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -30,9 +31,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Devices
@@ -55,13 +54,14 @@ fun MarkersTable(
     search: (String) -> Unit,
     userID: String,
     deleteMarker: (String) -> Flow<Response<String>>,
-    toggleFocus: (focus: Boolean) -> Unit
+    toggleFocus: (focus: Boolean) -> Unit,
+    isFocused: Boolean = false
 ) {
 
     Column(modifier.background(MaterialTheme.colorScheme.background)) {
         SearchBar(onSearch = { query -> search(query) }, toggleFocus = toggleFocus)
         Spacer(modifier = Modifier.height(16.dp))
-        ItemList(items = items, userID = userID, deleteMarker = deleteMarker)
+        ItemList(items = items, userID = userID, deleteMarker = deleteMarker, isFocused = isFocused)
     }
 
 }
@@ -70,7 +70,8 @@ fun MarkersTable(
 fun ItemList(
     items: List<MarkerModel>,
     userID: String,
-    deleteMarker: (String) -> Flow<Response<String>>
+    deleteMarker: (String) -> Flow<Response<String>>,
+    isFocused: Boolean
 ) {
     val scope = rememberCoroutineScope()
     var showDeleteDialog by remember { mutableStateOf(false) }
@@ -95,7 +96,11 @@ fun ItemList(
             onDismissRequest = { showDeleteDialog = false }
         )
 
-    LazyColumn {
+    val modifier = if (!isFocused) Modifier.fillMaxHeight(0.5f) else Modifier
+
+    LazyColumn(
+        modifier = modifier
+    ) {
         item {
             Row(
                 modifier = Modifier
@@ -184,7 +189,7 @@ fun SearchBar(onSearch: (String) -> Unit, toggleFocus: (focus: Boolean) -> Unit)
             .fillMaxWidth(),
         singleLine = true,
         trailingIcon = {
-            if (!text.isNotEmpty()) {
+            if (text.isNotEmpty()) {
                 IconButton(
                     onClick = {
                         text = ""
@@ -207,7 +212,6 @@ fun SearchBar(onSearch: (String) -> Unit, toggleFocus: (focus: Boolean) -> Unit)
 @Composable
 fun ObserveKeyboardState(onKeyboardVisibilityChanged: (Boolean) -> Unit) {
     val view = LocalView.current
-    val density = LocalDensity.current
 
     DisposableEffect(view) {
         val listener = ViewTreeObserver.OnGlobalLayoutListener {

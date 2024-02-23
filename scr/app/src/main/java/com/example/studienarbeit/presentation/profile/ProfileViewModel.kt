@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.studienarbeit.domain.model.MarkerModel
 import com.example.studienarbeit.domain.model.Response
+import com.example.studienarbeit.domain.repository.GeofencingRepository
 import com.example.studienarbeit.domain.use_case.marker.MarkerUseCases
 import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -20,7 +21,8 @@ import javax.inject.Inject
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
     private val useCases: MarkerUseCases?,
-    val auth: FirebaseAuth?
+    val auth: FirebaseAuth?,
+    val geofencingHelper: GeofencingRepository?
 
 ) : ViewModel() {
     private var _items: MutableStateFlow<List<MarkerModel>> =
