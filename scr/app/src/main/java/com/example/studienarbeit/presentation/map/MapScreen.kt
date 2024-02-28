@@ -3,10 +3,8 @@ package com.example.studienarbeit.presentation.map
 import RadiusSlider
 import android.os.Build
 import androidx.annotation.RequiresApi
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
@@ -16,8 +14,6 @@ import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.MyLocation
 import androidx.compose.material.icons.outlined.PersonOutline
-import androidx.compose.material3.BottomAppBar
-import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -188,23 +184,6 @@ fun MapScreen(
                             },
                             colors = topAppBarColors(containerColor = Color.Gray)
                         )
-                    },
-                    bottomBar = {
-                        BottomAppBar {
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxSize(),
-                                horizontalArrangement = Arrangement.SpaceEvenly,
-                            ) {
-                                Button(onClick = {
-                                    scope.launch {
-                                        viewModel.geofencingHelper.removeAllGeofences()
-                                    }
-                                }) {
-                                    Text("Remove all geofences")
-                                }
-                            }
-                        }
                     }
                 ) { innerPadding ->
                     Box(
@@ -224,7 +203,11 @@ fun MapScreen(
                             radius = appSettings.value.radius,
                             previewRadius = previewRadius.doubleValue,
                             showPreview = showPreviewState.value,
-                            navigateTo = navigateTo
+                            navigateTo = navigateTo,
+                            currentUser = viewModel.auth.currentUser?.uid ?: "",
+                            deleteMarker = {
+                                viewModel.deleteMarker(it)
+                            }
                         )
                         if (showPreviewState.value)
                             RadiusSlider(
@@ -246,5 +229,5 @@ private suspend fun CameraPositionState.centerOnLocation(
         location,
         16.3f
     ),
-    durationMs = 1500
+    durationMs = 1000
 )

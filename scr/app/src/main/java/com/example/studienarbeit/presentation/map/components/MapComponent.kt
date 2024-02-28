@@ -6,8 +6,6 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
@@ -18,12 +16,9 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.example.studienarbeit.domain.model.MarkerModel
+import com.example.studienarbeit.domain.model.Response
 import com.example.studienarbeit.presentation.Navigator
-import com.example.studienarbeit.presentation.map.states.BootomSheetState
 import com.example.studienarbeit.presentation.map.states.MarkersState
 import com.example.studienarbeit.utils.Icons
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -38,6 +33,7 @@ import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapType
 import com.google.maps.android.compose.MapUiSettings
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -50,14 +46,16 @@ fun MapComponent(
     radius: Double,
     previewRadius: Double,
     showPreview: Boolean,
-    navigateTo : (String) -> Unit
+    navigateTo: (String) -> Unit,
+    currentUser: String,
+    deleteMarker: (id: String) -> Flow<Response<String>>,
 ) {
 
     var showBottomSheet by remember { mutableStateOf(false) }
-    var bottomSheetState by remember { mutableStateOf(BootomSheetState("", "")) }
+    val sheetState = rememberModalBottomSheetState()
+    var bottomSheetState by remember { mutableStateOf(MarkerModel()) }
     var tempMarker by remember { mutableStateOf<MarkerModel?>(null) }
 
-    val sheetState = rememberModalBottomSheetState()
     val scope = rememberCoroutineScope()
 
     Column(
@@ -66,22 +64,24 @@ fun MapComponent(
             .padding(innerPadding)
     ) {
         if (showBottomSheet) {
-            ModalBottomSheet(
+            MarkerBottomSheet(
                 onDismissRequest = { showBottomSheet = false },
-                sheetState = sheetState
-            ) {
-                //title and descritpion
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Text(
-                        modifier = Modifier
-                            .padding(bottom = 8.dp),
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 22.sp,
-                        text = bottomSheetState.title
-                    )
-                    Text(text = bottomSheetState.description)
-                }
-            }
+                bottomSheetState = bottomSheetState,
+                currentUser = currentUser,
+                sheetState = sheetState,
+                onDeleteRequest = {
+                    scope.launch {
+                        deleteMarker(bottomSheetState.id).collect{
+                            if (it is Response.Success) {
+                                showBottomSheet = false
+                            }else if(it is Response.Error){
+                                Log.d("Map", "Error deleting marker: ${it.message}")
+                            }
+
+                        }
+                    }
+                },
+            )
         }
         if (tempMarker != null)
             ConfirmAddDialog(onDismissRequest = { tempMarker = null }, onConfirm = {
@@ -91,7 +91,7 @@ fun MapComponent(
                     "Map",
                     "Add marker at $lat, $long"
                 )
-                val navString = Navigator.NavTarget.ADD_MARKER.label+"/$lat/$long"
+                val navString = Navigator.NavTarget.ADD_MARKER.label + "/$lat/$long"
                 navigateTo(navString)
                 tempMarker = null
             },
@@ -136,10 +136,7 @@ fun MapComponent(
                     (markers.value as MarkersState.Success).markerModels.forEach { marker ->
                         ImageMarker(marker = marker,
                             onClick = {
-                                bottomSheetState = BootomSheetState(
-                                    marker.title,
-                                    marker.description
-                                )
+                                bottomSheetState = marker
                                 showBottomSheet = true
                                 scope.launch { sheetState.show() }
                             }

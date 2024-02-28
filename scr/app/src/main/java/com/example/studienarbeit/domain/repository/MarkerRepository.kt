@@ -8,7 +8,7 @@ interface MarkerRepository {
 
     fun getMarkers(): Flow<Response<List<MarkerModel>>>
 
-    fun deleteMarker(markerId: String): Flow<Response<Unit>>
+    fun deleteMarker(markerId: String): Flow<Response<String>>
 
     fun addMarker(
         title: String,

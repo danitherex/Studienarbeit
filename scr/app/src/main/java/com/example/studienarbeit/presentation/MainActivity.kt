@@ -36,6 +36,7 @@ import com.example.studienarbeit.presentation.map.MapViewModel
 import com.example.studienarbeit.presentation.permissions.PermissionScreen
 import com.example.studienarbeit.presentation.permissions.PermissionViewModel
 import com.example.studienarbeit.presentation.profile.ProfileScreen
+import com.example.studienarbeit.presentation.profile.ProfileViewModel
 import com.example.studienarbeit.presentation.signin.SignInScreen
 import com.example.studienarbeit.presentation.signin.SignInViewModel
 import com.example.studienarbeit.ui.theme.StudienarbeitTheme
@@ -139,12 +140,13 @@ class MainActivity : ComponentActivity() {
 
                             if (hasAppPermissions())
                                 navigator.navigateTo(Navigator.NavTarget.MAP)
-
-                            LaunchedEffect(permissionsGranted.value) {
-                                if (permissionsGranted.value)
-                                    navigator.navigateTo(Navigator.NavTarget.MAP)
+                            else {
+                                LaunchedEffect(permissionsGranted.value) {
+                                    if (permissionsGranted.value)
+                                        navigator.navigateTo(Navigator.NavTarget.MAP)
+                                }
+                                PermissionScreen(viewModel)
                             }
-                            PermissionScreen(viewModel)
                         }
                         navigation(
                             startDestination = Navigator.NavTarget.MAP.label,
@@ -161,7 +163,7 @@ class MainActivity : ComponentActivity() {
                                     }
                                 )
                             }
-                            composable(Navigator.NavTarget.ADD_MARKER.label+"/{latitude}/{longitude}") {
+                            composable(Navigator.NavTarget.ADD_MARKER.label + "/{latitude}/{longitude}") {
                                 val arguments = it.arguments
                                 val _latitude = arguments?.getString("latitude")
                                 val _longitude = arguments?.getString("longitude")
@@ -180,7 +182,10 @@ class MainActivity : ComponentActivity() {
                             }
 
                             composable(Navigator.NavTarget.PROFILE.label) {
+                                val viewModel = hiltViewModel<ProfileViewModel>()
+
                                 ProfileScreen(
+                                    viewModel = viewModel,
                                     userData = googleAuthUiClient.getSignedUser(),
                                     onSignOut = {
                                         lifecycleScope.launch {
