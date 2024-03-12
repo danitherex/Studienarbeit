@@ -19,6 +19,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -115,7 +116,7 @@ fun MapScreen(
                         Column {
                             if (showPreviewState.value) {
                                 FloatingActionButton(
-                                    containerColor = Color.Red,
+                                    containerColor = Color.hsl(359F, 0.54F, 0.58F),
                                     onClick = {
                                         viewModel.togglePreview()
                                     }) {
@@ -127,7 +128,9 @@ fun MapScreen(
                                 Spacer(modifier = Modifier.height(8.dp))
                             }
                             FloatingActionButton(
-                                containerColor = if (showPreviewState.value) Color.Green else Color.Blue,
+                                containerColor = if (showPreviewState.value) Color.hsl(94F, 0.21F,
+                                    0.58F
+                                ) else MaterialTheme.colorScheme.primary,
                                 onClick = {
                                     if (showPreviewState.value) {
                                         scope.launch {
@@ -152,7 +155,7 @@ fun MapScreen(
                             }
                             Spacer(modifier = Modifier.height(8.dp))
                             FloatingActionButton(
-                                containerColor = Color.Blue,
+                                containerColor = MaterialTheme.colorScheme.primary,
                                 onClick = {
                                     scope.launch {
                                         cameraState.centerOnLocation(currentLoc)
@@ -170,7 +173,7 @@ fun MapScreen(
                     topBar = {
                         TopAppBar(
                             title = {
-                                Text(text = (context.getString(R.string.app_name)))
+                                Text(text = (context.getString(R.string.app_name)), color = MaterialTheme.colorScheme.onSecondary)
                             },
                             actions = {
                                 IconButton(onClick = {
@@ -178,11 +181,12 @@ fun MapScreen(
                                 }) {
                                     Icon(
                                         imageVector = Icons.Outlined.PersonOutline,
-                                        contentDescription = "Profile"
+                                        contentDescription = "Profile",
+                                        tint = MaterialTheme.colorScheme.onSecondary
                                     )
                                 }
                             },
-                            colors = topAppBarColors(containerColor = Color.Gray)
+                            colors = topAppBarColors(containerColor = MaterialTheme.colorScheme.secondary)
                         )
                     }
                 ) { innerPadding ->

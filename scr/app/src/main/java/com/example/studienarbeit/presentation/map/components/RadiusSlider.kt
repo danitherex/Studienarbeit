@@ -1,7 +1,9 @@
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
+import androidx.compose.material3.SliderDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableDoubleState
 import androidx.compose.ui.Modifier
@@ -42,6 +44,11 @@ fun RadiusSlider(
                 }
             }
             .width(350.dp)
-            .height(65.dp)
+            .height(65.dp),
+        colors = SliderDefaults.colors(
+            thumbColor = MaterialTheme.colorScheme.primary,
+            activeTrackColor = MaterialTheme.colorScheme.primary,
+            inactiveTrackColor = MaterialTheme.colorScheme.onPrimary
+        )
     )
 }

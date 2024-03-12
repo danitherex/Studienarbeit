@@ -152,7 +152,7 @@ fun MapComponent(
                 center = currentPosition,
                 strokeColor = Color.Black,
                 radius = radius,
-                strokeWidth = 20.0F,
+                strokeWidth = 15.0F,
 
                 )
             if (showPreview)
@@ -160,7 +160,7 @@ fun MapComponent(
                     center = currentPosition,
                     strokeColor = Color.Magenta,
                     radius = previewRadius,
-                    strokeWidth = 10.0F,
+                    strokeWidth = 15.0F,
                     strokePattern = listOf(Dot(), Gap(10.0f)),
                 )
 
