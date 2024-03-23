@@ -1,20 +1,22 @@
 package com.example.studienarbeit.services
 
 import android.app.Notification
+import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.util.Log
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.example.studienarbeit.R
-import com.example.studienarbeit.utils.Icons
 import com.example.studienarbeit.settings.datastore
 import com.example.studienarbeit.utils.Constants.GEOFENCE_CHANNEL_ID
 import com.example.studienarbeit.utils.Constants.NOTIFICATION_GROUP_KEY_GEOFENCE
 import com.example.studienarbeit.utils.Constants.SUMMARY_ID
+import com.example.studienarbeit.utils.Icons
 import com.google.android.gms.location.Geofence
 import com.google.android.gms.location.GeofencingEvent
 import kotlinx.coroutines.CoroutineScope
@@ -75,6 +77,11 @@ class GeofenceBroadcastReceiver : BroadcastReceiver() {
         } else
             Icons.entries.find { it.name == (marker.type.uppercase()) }
                 ?: Icons.RESTAURANT
+        val latitude = marker?.position?.latitude
+        val longitude = marker?.position?.longitude
+
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse("google.navigation:q=$latitude,$longitude&mode=w"))
+        val pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_IMMUTABLE)
 
 
         return NotificationCompat.Builder(context, GEOFENCE_CHANNEL_ID)
@@ -85,6 +92,7 @@ class GeofenceBroadcastReceiver : BroadcastReceiver() {
             .setOngoing(true)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             .setGroup(NOTIFICATION_GROUP_KEY_GEOFENCE)
+            .addAction(R.drawable.google_map,"Navigate",pendingIntent)
             .build()
 
     }
